@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: np-scheduler-test-job
+  name: np-scheduler-test-job
+  namespace: vault
+spec:
+  serviceAccountName: internal-app
+  containers:
+  - image: hub.saobang.vn/nextpay/np-schedule/np-scheduler-test-job:dev-2bde0a75
+    name: np-scheduler-test-job
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

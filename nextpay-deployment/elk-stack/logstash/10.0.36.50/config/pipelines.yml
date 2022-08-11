@@ -1,0 +1,11 @@
+- pipeline.id: vipost
+  path.config: "/usr/share/logstash/config/pipeline/01-vipost.conf"
+  pipeline.workers: 1
+
+- pipeline.id: mpos
+  path.config: "/usr/share/logstash/config/pipeline/02-mpos.conf"
+  pipeline.workers: 1
+
+- pipeline.id: vimo
+  path.config: "/usr/share/logstash/config/pipeline/03-vimo.conf"
+  pipeline.workers: 1

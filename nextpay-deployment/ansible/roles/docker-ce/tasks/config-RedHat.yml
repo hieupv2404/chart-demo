@@ -1,0 +1,21 @@
+---
+- name: Create Docker data directory
+  file:
+    state: directory
+    path: "{{ docker_home_path }}"
+
+- name: Copy docker daemon json config file
+  copy:
+    src: daemon.json
+    dest: /etc/docker/
+
+- name: Start docker daemon
+  systemd:
+    state: started
+    name: docker
+    enabled: yes
+
+- name: Add user to docker group
+  user:
+    name: "{{ docker_user }}"
+    group: docker

@@ -1,0 +1,46 @@
+
+# list connector
+curl --location --request GET 'http://localhost:8083/connectors'
+
+# view connector config.
+# Change connector name when run
+curl --location --request GET 'http://localhost:8083/connectors/jdbc-vipost-bills-source/config'
+
+# view connector status
+# Change connector name when run
+curl --location --request GET 'http://localhost:8083/connectors/jdbc-vipost-bills-source/status'
+
+
+# create jdbc connector
+curl --location --request POST 'http://localhost:8083/connectors' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+	"name": "jdbc-vipost-bills-source",
+	"config": {
+		"connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+		"timestamp.column.name": "UPDATED",
+		"incrementing.column.name": "ID",
+		"transforms.createKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+		"connection.password": "",
+		"tasks.max": "1",
+		"transforms": "setValueSchema,createKey,extractInt",
+		"table.types": "QUERY",
+		"mode": "timestamp+incrementing",
+		"topic.prefix": "Db-vipost-bill",
+		"transforms.createKey.fields": "ID",
+		"db.timezone": "Asia/Ho_Chi_Minh",
+		"poll.interval.ms": "10000",
+		"transforms.setValueSchema.type": "org.apache.kafka.connect.transforms.SetSchemaMetadata$Value",
+		"validate.non.null": "false",
+		"query": "SELECT CAST(id AS NUMBER(18, 0)) id, customer_code, bill_code, bill_type, period, CAST(total_amount AS NUMBER(18, 5)) total_amount, customer_name, customer_addr, customer_phone, pm_province_name, pm_district_name, pm_post_office_name, created, updated, status, version, created_by, updated_by, refund_by, customer_evn_unit, CAST(pm_province_id AS NUMBER(18, 0)) pm_province_id, CAST(pm_district_id AS NUMBER(18, 0)) pm_district_id, CAST(pm_post_office_id AS NUMBER(18, 0)) pm_post_office_id, wallet_cashier, wallet_cashier_name, pm_evn_unit_name, request_type, partner_req_id, CAST(trans_modify_bill_id AS NUMBER(18, 0)) trans_modify_bill_id, CAST(pm_period_id AS NUMBER(18, 0)) pm_period_id, pm_period_name FROM VIPOST.bills",
+		"transforms.extractInt.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+		"batch.max.rows": "50",
+		"transforms.extractInt.field": "ID",
+		"connection.user": "kafka",
+		"schema.pattern": "VIPOST",
+		"name": "jdbc-vipost-bills-source",
+		"numeric.mapping": "best_fit",
+		"transforms.setValueSchema.schema.name": "io.confluent.connect.avro.DbVipostBill",
+		"connection.url": "jdbc:oracle:thin:@10.0.36.33:1539:vpdb"
+	}
+}'

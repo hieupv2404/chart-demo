@@ -1,0 +1,14 @@
+instances:
+  - name: elasticsearch-uat
+    dns:
+      - elasticsearch.uat
+    ip:
+      - 10.1.121.33
+  - name: kibana-uat
+    dns:
+      - kibana.uat
+  - name: logstash-uat
+    dns:
+      - logstash.uat
+    ip:
+      - 10.1.121.31

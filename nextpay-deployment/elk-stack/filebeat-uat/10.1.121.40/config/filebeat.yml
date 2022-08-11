@@ -1,0 +1,31 @@
+# List of inputs to fetch data.
+filebeat.config.inputs:
+  enabled: true
+  path: /usr/share/filebeat/inputs.d/*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+#----------------------------- Logstash output ---------------------------------
+output.kafka:
+  # initial brokers for reading cluster metadata
+  hosts: ["10.1.121.55:9092"]
+
+  # message topic selection + partitioning
+  topic: 'vimo-log'
+
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
+  retry.backoff: 1000
+
+#================================ Logging ======================================
+# There are four options for the log output: file, stderr, syslog, eventlog
+# The file output is the default.
+logging.metrics.enabled: false
+logging.to_stderr: false
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  rotateeverybytes: 1073741824 # 1GB
+  keepfiles: 1

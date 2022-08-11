@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${TAG}
+    container_name: elasticsearch-${TAG}
+    hostname: elasticsearch.prod
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - ES_JAVA_OPTS=-Xms2g -Xmx6g -Des.transport.cname_in_publish_address=true
+      - CERTS_DIR=${CERTS_DIR}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ports:
+      - 9200:9200
+    networks:
+      default:
+        aliases:
+         - elasticsearch.prod
+    volumes:
+      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - elk-git-repo_esdata:/usr/share/elasticsearch/data
+      - elk-git-repo_es_backup_data:/usr/share/elasticsearch/backup/repository
+      - ./setup_ssl/certs/ca:${CERTS_DIR}/ca
+      - ./setup_ssl/certs/elasticsearch-prod:${CERTS_DIR}/elasticsearch
+    healthcheck:
+      test: curl -s http://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  elk-git-repo_esdata:
+    external: true
+  elk-git-repo_es_backup_data:
+    external: true
+
+networks:
+  default:
+    external:
+      name: docker-prod

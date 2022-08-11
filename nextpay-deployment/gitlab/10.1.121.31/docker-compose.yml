@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine-v11.11.1
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+  
+  gitlab-runner-ansible:
+    image: gitlab/gitlab-runner:alpine-v11.11.1
+    container_name: gitlab-runner-ansible
+    restart: always
+    volumes:
+      - config_ansible:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/duclm/.ssh:/root/.ssh
+
+
+volumes:
+  config:
+  config_ansible:
+
+networks:
+  default:
+    external:
+      name: uat-docker-network

@@ -1,0 +1,7 @@
+- module: mongodb
+  log:
+    enabled: true
+    var.paths: ["/var/logs/mongodb/*.log"]
+    input:
+      fields:
+        pipeline: mongodb-macq

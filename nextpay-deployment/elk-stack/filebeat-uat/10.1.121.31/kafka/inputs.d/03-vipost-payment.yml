@@ -1,0 +1,8 @@
+- type: log
+  paths: 
+    - /var/logs/vipost/payment/vipost-payment-default.log
+  fields:
+    log_type: vipost-payment
+  scan_frequency: 5s
+  encoding: utf-8
+  json.keys_under_root: true

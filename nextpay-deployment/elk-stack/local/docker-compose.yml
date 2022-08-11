@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERISON}
+    container_name: elasticsearch
+    volumes:
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 9200:9200
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - ES_JAVA_OPTS=-Xmx256m -Xms256m
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    networks:
+      - elk
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERISON}
+    container_name: kibana
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ports:
+      - 5601:5601
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    networks:
+      - elk
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:${ELASTIC_VERISON}
+    container_name: apm-server
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ports:
+      - 8200:8200
+    command: --strict.perms=false -e # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml
+    networks:
+      - elk
+
+networks:
+  elk:

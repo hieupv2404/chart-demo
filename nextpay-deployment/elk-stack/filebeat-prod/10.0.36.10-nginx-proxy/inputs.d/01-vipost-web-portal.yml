@@ -1,0 +1,8 @@
+- type: log
+  paths:
+    - /var/logs/nginx/vipost.vimo.vn_access.log
+  fields:
+    nginx:
+      server: 36-10
+  scan_frequency: 1s
+  encoding: utf-8

@@ -1,0 +1,9 @@
+- type: log
+  paths: 
+    - /var/logs/user/vimo-user-app.log
+  fields:
+    project:
+      name: vimo
+  scan_frequency: 3s
+  encoding: utf-8
+  json.keys_under_root: true

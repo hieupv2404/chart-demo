@@ -1,0 +1,9 @@
+- type: log
+  paths:
+    - /var/logs/baoviet-api/baoviet-api.log
+  fields:
+    project:
+      name: baoviet-api
+  scan_frequency: 5s
+  encoding: utf-8
+  json.keys_under_root: true

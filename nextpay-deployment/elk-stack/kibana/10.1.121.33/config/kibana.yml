@@ -1,0 +1,18 @@
+# Default Kibana configuration from kibana-docker.
+
+server.name: "kibana-uat"
+server.host: "kibana.uat"
+
+# server.ssl.enabled: true
+# server.ssl.certificate: /usr/share/kibana/config/certs/kibana-uat.crt
+# server.ssl.key: /usr/share/kibana/config/certs/kibana-uat.key
+
+# The URLs of the Elasticsearch instances to use for all queries.
+# All nodes listed here must be on the same cluster.
+elasticsearch.hosts: [ "https://elasticsearch.uat:9200" ]
+elasticsearch.username: elastic
+elasticsearch.password: ${ELASTIC_PASSWORD}
+elasticsearch.ssl.certificateAuthorities: [ "/usr/share/kibana/config/certs/ca.crt" ]
+
+xpack.monitoring.ui.container.elasticsearch.enabled: true
+xpack.encryptedSavedObjects.encryptionKey: "JYmxnUHy22!N*!7xUAjGYXtKaH7Y4V6.d-YUcGCd"

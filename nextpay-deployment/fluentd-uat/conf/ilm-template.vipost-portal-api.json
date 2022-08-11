@@ -1,0 +1,9 @@
+{
+  "index_patterns": ["fluentd-vipost-portal-api-*"],
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1,
+    "index.lifecycle.name": "fluentd-vipost-portal-api-policy",
+    "index.lifecycle.rollover_alias": "fluentd-vipost-portal-api"
+  }
+}

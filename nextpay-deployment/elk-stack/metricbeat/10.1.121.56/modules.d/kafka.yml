@@ -1,0 +1,36 @@
+#-------------------------------- Kafka Module --------------------------------
+# Kafka metrics collected using the Kafka protocol
+- module: kafka
+  #metricsets:
+  #  - partition
+  #  - consumergroup
+  period: 10s
+  hosts: ["localhost:39092"]
+
+  client_id: metricbeat-10.1.121.56
+  retries: 3
+  backoff: 1000ms
+
+  # List of Topics to query metadata for. If empty, all topics will be queried.
+  #topics: []
+
+# Metrics collected from a Kafka broker using Jolokia
+#- module: kafka
+#  metricsets:
+#    - broker
+#  period: 10s
+#  hosts: ["localhost:8779"]
+
+# Metrics collected from a Java Kafka consumer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - consumer
+#  period: 10s
+#  hosts: ["localhost:8774"]
+
+# Metrics collected from a Java Kafka producer using Jolokia
+#- module: kafka
+#  metricsets:
+#    - producer
+#  period: 10s
+#  hosts: ["localhost:8775"]

@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${TAG}
+    container_name: filebeat-kafka
+    hostname: ${HOSTNAME:?err}
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    command: --strict.perms=false -e  # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./inputs.d/:/usr/share/filebeat/inputs.d/:ro
+      - vipost-portal-api_log:/var/logs/vipost/portal-api/:ro
+      - vipostpayoff_log:/var/logs/vipost/payoff/:ro
+      - vipostsynerror_log:/var/logs/vipost/sync-error/:ro
+      - vipostsynorders_log:/var/logs/vipost/sync-order/:ro
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+    healthcheck:
+      test: filebeat test config
+      interval: 30s
+      timeout: 15s
+      retries: 5
+
+# use docker volume to persist ES data outside of a container.
+volumes:
+  vipost-portal-api_log:
+      external: true
+  vipostpayoff_log:
+      external: true
+  vipostsynerror_log:
+      external: true
+  vipostsynorders_log:
+      external: true

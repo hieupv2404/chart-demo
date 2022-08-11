@@ -1,0 +1,9 @@
+---
+- hosts: all
+
+  tasks:
+    - name: Create archive log directory
+      file:
+        path: /etc/postgres/archive
+        state: directory
+        mode: 700

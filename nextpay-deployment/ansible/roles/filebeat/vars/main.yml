@@ -1,0 +1,15 @@
+---
+# vars file for filebeat
+version: 7.7.0
+
+bin_dir: /usr/share/filebeat/bin
+config_dir: /etc/filebeat/{{ service }}
+data_dir: /var/lib/filebeat/{{ service }}
+log_dir: /var/log/filebeat/{{ service }}
+pid_dir: /var/run/{{ service }}
+
+directory_layout:
+  - "{{ config_dir }}"
+  - "{{ data_dir }}"
+  - "{{ log_dir }}"
+  - "{{ pid_dir }}"

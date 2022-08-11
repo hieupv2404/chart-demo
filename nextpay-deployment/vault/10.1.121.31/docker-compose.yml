@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  vault:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vn.nextpay/vault:latest
+    container_name: vault
+    restart: always
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:${API_PORT}
+    volumes:
+      - ./config.hcl:/vault/config/config.hcl
+      - ./policies:/vault/policies
+    ports:
+      - "8900:${API_PORT}"
+    command: server
+    logging:
+      options:
+        max-size: "512m"
+        max-file: "3"
+      driver: json-file
+
+networks:
+  default:
+    external:
+      name: uat-docker-network

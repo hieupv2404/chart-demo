@@ -1,0 +1,21 @@
+instances:
+  - name: elasticsearch-prod
+    dns:
+      - elasticsearch.prod
+    ip:
+      - 10.0.36.50
+  - name: kibana-prod
+    dns:
+      - kibana.prod
+    ip:
+      - 10.0.36.50
+  - name: logstash-prod
+    dns:
+      - logstash.prod
+    ip:
+      - 10.0.36.50
+  - name: apm-server-prod
+    dns:
+      - apm-server.prod
+    ip:
+      - 10.0.36.50

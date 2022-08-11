@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heartbeat-extra-config
+data:
+  ilm.json: |
+    {
+      "policy": {
+        "_meta": {
+          "description": "used for heartbeat index",
+          "project": {
+            "name": "NextPay monitoring",
+            "department": "DevOps"
+          }
+        },
+        "phases" : {
+          "hot" : {
+            "min_age" : "0ms",
+            "actions" : {
+              "rollover" : {
+                "max_primary_shard_size" : "20gb",
+                "max_age" : "30d"
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : "1m",
+            "actions" : {
+              "delete" : {
+                "delete_searchable_snapshot" : true
+              }
+            }
+          }
+        }
+      }
+    }

@@ -1,0 +1,9 @@
+{
+  "index_patterns": ["fluentd-vipost-sync-error-*"],
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1,
+    "index.lifecycle.name": "fluentd-vipost-sync-error-policy",
+    "index.lifecycle.rollover_alias": "fluentd-vipost-sync-error"
+  }
+}

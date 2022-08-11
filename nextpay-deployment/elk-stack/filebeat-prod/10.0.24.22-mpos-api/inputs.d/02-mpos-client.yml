@@ -1,0 +1,11 @@
+- type: log
+  paths: 
+    - /var/logs/mpos-api-client/*.txt
+  fields:
+    log_type: mpos-api-client
+  scan_frequency: 3s
+  encoding: utf-8
+  multiline.type: pattern
+  multiline.pattern: '^ANDROID|^IOS'
+  multiline.negate: true
+  multiline.match: after

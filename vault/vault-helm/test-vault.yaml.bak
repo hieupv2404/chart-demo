@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine
+  labels:
+    app: alpine
+spec:
+  selector:
+    matchLabels:
+      app: alpine
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: alpine
+    spec:
+      serviceAccountName: internal-app
+      containers:
+        - name: alpine
+          image: alpine:latest

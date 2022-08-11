@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  nexus:
+    image: sonatype/nexus3
+    container_name: nexus
+    restart: always
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - INSTALL4J_ADD_VM_PARAMS=-Xms2g -Xmx2g -XX:MaxDirectMemorySize=4g -Djava.util.prefs.userRoot=/nexus-data/javaprefs
+    ports:
+      - 8901:8081
+      - 8083:8083
+    volumes:
+      - data:/nexus-data
+
+
+volumes:
+  data:
+
+networks:
+  default:
+    external:
+      name: uat-docker-network

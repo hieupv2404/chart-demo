@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.16.2
+    container_name: filebeat
+    hostname: ${HOSTNAME:?err}
+    user: root # for adding docker metadata to processors
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    command: --strict.perms=false -e  # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./inputs.d/:/usr/share/filebeat/inputs.d/:ro
+      - vipost_log:/var/logs/vipost/core/
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+    healthcheck:
+      test: filebeat test config
+      interval: 30s
+      timeout: 15s
+      retries: 5
+
+# use docker volume to persist ES data outside of a container.
+volumes:
+  vipost_log:
+      external: true

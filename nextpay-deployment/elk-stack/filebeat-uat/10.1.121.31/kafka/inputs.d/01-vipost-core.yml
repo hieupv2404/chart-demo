@@ -1,0 +1,8 @@
+- type: log
+  paths: 
+    - /var/logs/vipost/core/vipost-core-default.log
+  fields:
+    log_type: vipost-core
+  scan_frequency: 5s
+  encoding: utf-8
+  json.keys_under_root: true

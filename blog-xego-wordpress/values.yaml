@@ -1,0 +1,58 @@
+global:
+  storageClass: "glusterfs"
+wordpress:
+  nameOverride: "blog-xego-wordpress"
+  fullnameOverride: "blog-xego-wordpress"
+  wordpressUsername: "admin"
+  wordpressPassword: "Uu%M*Xp9ZzA6*P7M"
+  wordpressEmail: "admin@xego.vn"
+  wordpressFirstName: "Admin"
+  wordpressLastName: "xego"
+  wordpressBlogName: "Xego's Blog"
+  allowEmptyPassword: false
+  smtpHost: "smtp.gmail.com"
+  smtpPort: "465"
+  smtpUser: "admin@xego.vn"
+  smtpPassword: "XEGO@@123!!"
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 2048Mi
+    requests:
+      cpu: 1000m
+      memory: 1024Mi
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: true
+    hostname: "blog.xego.vn"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+      kubernetes.io/tls-acme: "true"
+    extraTls:
+      - hosts:
+          - blog.xego.vn
+        secretName: blog-xego-cert
+  persistence:
+    enabled: true
+    size: 5Gi
+  volumePermissions:
+    enabled: true
+  mariadb:
+    enabled: true
+    auth:
+      rootPassword: "w9oZzFh5L3ZUdnOCTqt3"
+      password: "CZYHbgjJ8fdoMswv2E1H"
+    primary:
+      resources:
+        requests:
+          memory: "750Mi"
+          cpu: "200m"
+        limits:
+          memory: "1024Mi"
+          cpu: "500m"
+      persistence:
+        enabled: true
+        size: 2Gi
+  memcached:
+    enabled: true

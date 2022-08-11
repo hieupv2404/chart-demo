@@ -1,0 +1,563 @@
+{
+  "metadata": {
+    "name": "np-scheduler",
+    "namespace": "argocd",
+    "selfLink": "/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/np-scheduler",
+    "uid": "092d4098-11ed-47c0-bef1-1c1d1c53dcc9",
+    "resourceVersion": "235014070",
+    "generation": 115737,
+    "creationTimestamp": "2021-07-20T10:34:43Z",
+    "annotations": {
+      "notifications.argoproj.io/subscribe.on-sync-succeeded.slack": "noti-argocd",
+      "notifications.argoproj.io/subscribe.slack": "noti-argocd"
+    },
+    "finalizers": ["resources-finalizer.argocd.argoproj.io"]
+  },
+  "spec": {
+    "source": {
+      "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+      "path": ".",
+      "targetRevision": "HEAD",
+      "helm": {
+        "valueFiles": ["values-dev.yaml"],
+        "releaseName": "np-scheduler",
+        "version": "v3"
+      }
+    },
+    "destination": {
+      "server": "https://kubernetes.default.svc",
+      "namespace": "nextpay-services"
+    },
+    "project": "nextpay-scheduler",
+    "syncPolicy": {
+      "automated": { "prune": true, "selfHeal": true },
+      "syncOptions": ["CreateNamespace=false"],
+      "retry": {
+        "limit": 3,
+        "backoff": { "duration": "5s", "factor": 2, "maxDuration": "3m" }
+      }
+    }
+  },
+  "status": {
+    "resources": [
+      {
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-api",
+        "status": "Synced"
+      },
+      {
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-logtime",
+        "status": "Synced"
+      },
+      {
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-test-job",
+        "status": "Synced"
+      },
+      {
+        "version": "v1",
+        "kind": "ConfigMap",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-web",
+        "status": "Synced"
+      },
+      {
+        "version": "v1",
+        "kind": "Service",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-api",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "version": "v1",
+        "kind": "Service",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-logtime",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "version": "v1",
+        "kind": "Service",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-test-job",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "version": "v1",
+        "kind": "Service",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-web",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-api",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-logtime",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-test-job",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "group": "apps",
+        "version": "v1",
+        "kind": "Deployment",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-web",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "group": "networking.k8s.io",
+        "version": "v1",
+        "kind": "Ingress",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-api",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "group": "networking.k8s.io",
+        "version": "v1",
+        "kind": "Ingress",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-logtime",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      },
+      {
+        "group": "networking.k8s.io",
+        "version": "v1",
+        "kind": "Ingress",
+        "namespace": "nextpay-services",
+        "name": "np-scheduler-web",
+        "status": "Synced",
+        "health": { "status": "Healthy" }
+      }
+    ],
+    "sync": {
+      "status": "Synced",
+      "comparedTo": {
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "destination": {
+          "server": "https://kubernetes.default.svc",
+          "namespace": "nextpay-services"
+        }
+      },
+      "revision": "f836f96531d0006ad959ae32d8c9b9cf01c582f9"
+    },
+    "health": { "status": "Healthy" },
+    "history": [
+      {
+        "revision": "648d29903089a51e2752ffe7616ece954ee15bc5",
+        "deployedAt": "2022-03-29T09:42:58Z",
+        "id": 85,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-29T09:42:54Z"
+      },
+      {
+        "revision": "648d29903089a51e2752ffe7616ece954ee15bc5",
+        "deployedAt": "2022-03-29T09:51:09Z",
+        "id": 86,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-29T09:51:04Z"
+      },
+      {
+        "revision": "d729adb007d17dea93dd922f7fceb3d27f58c524",
+        "deployedAt": "2022-03-29T09:54:17Z",
+        "id": 87,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-29T09:54:15Z"
+      },
+      {
+        "revision": "d729adb007d17dea93dd922f7fceb3d27f58c524",
+        "deployedAt": "2022-03-29T10:58:06Z",
+        "id": 88,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-29T10:58:05Z"
+      },
+      {
+        "revision": "173ab6e8c5652745e69f1509f964a5fb75736476",
+        "deployedAt": "2022-03-29T11:04:10Z",
+        "id": 89,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-29T11:04:09Z"
+      },
+      {
+        "revision": "d2a0c58117bb34a230d23826710576103aa2d786",
+        "deployedAt": "2022-03-30T02:10:27Z",
+        "id": 90,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-30T02:10:21Z"
+      },
+      {
+        "revision": "d23b76ad4df8c03a261d1568a7893c4d38076c11",
+        "deployedAt": "2022-03-30T02:26:53Z",
+        "id": 91,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-30T02:26:51Z"
+      },
+      {
+        "revision": "559e2a09df13788abb5e124eda94b02ae606f598",
+        "deployedAt": "2022-03-30T02:32:36Z",
+        "id": 92,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-30T02:32:34Z"
+      },
+      {
+        "revision": "f7528cb4293acc36b7e4570198c37187de417052",
+        "deployedAt": "2022-03-30T04:01:17Z",
+        "id": 93,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-30T04:01:12Z"
+      },
+      {
+        "revision": "f836f96531d0006ad959ae32d8c9b9cf01c582f9",
+        "deployedAt": "2022-03-30T04:36:22Z",
+        "id": 94,
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        },
+        "deployStartedAt": "2022-03-30T04:36:18Z"
+      }
+    ],
+    "reconciledAt": "2022-03-30T04:45:54Z",
+    "operationState": {
+      "operation": {
+        "sync": {
+          "revision": "f836f96531d0006ad959ae32d8c9b9cf01c582f9",
+          "prune": true,
+          "syncOptions": ["CreateNamespace=false"]
+        },
+        "initiatedBy": { "automated": true },
+        "retry": {
+          "limit": 3,
+          "backoff": { "duration": "5s", "factor": 2, "maxDuration": "3m" }
+        }
+      },
+      "phase": "Succeeded",
+      "message": "successfully synced (all tasks run)",
+      "syncResult": {
+        "resources": [
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "ConfigMap",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-api",
+            "status": "Synced",
+            "message": "configmap/np-scheduler-api unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "ConfigMap",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-web",
+            "status": "Synced",
+            "message": "configmap/np-scheduler-web unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "ConfigMap",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-logtime",
+            "status": "Synced",
+            "message": "configmap/np-scheduler-logtime unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "ConfigMap",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-test-job",
+            "status": "Synced",
+            "message": "configmap/np-scheduler-test-job unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "Service",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-logtime",
+            "status": "Synced",
+            "message": "service/np-scheduler-logtime unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "Service",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-api",
+            "status": "Synced",
+            "message": "service/np-scheduler-api unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "Service",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-test-job",
+            "status": "Synced",
+            "message": "service/np-scheduler-test-job unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "",
+            "version": "v1",
+            "kind": "Service",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-web",
+            "status": "Synced",
+            "message": "service/np-scheduler-web unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "apps",
+            "version": "v1",
+            "kind": "Deployment",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-test-job",
+            "status": "Synced",
+            "message": "deployment.apps/np-scheduler-test-job configured",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "apps",
+            "version": "v1",
+            "kind": "Deployment",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-api",
+            "status": "Synced",
+            "message": "deployment.apps/np-scheduler-api configured",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "apps",
+            "version": "v1",
+            "kind": "Deployment",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-logtime",
+            "status": "Synced",
+            "message": "deployment.apps/np-scheduler-logtime configured",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "apps",
+            "version": "v1",
+            "kind": "Deployment",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-web",
+            "status": "Synced",
+            "message": "deployment.apps/np-scheduler-web configured",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "networking.k8s.io",
+            "version": "v1",
+            "kind": "Ingress",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-api",
+            "status": "Synced",
+            "message": "ingress.networking.k8s.io/np-scheduler-api unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "networking.k8s.io",
+            "version": "v1",
+            "kind": "Ingress",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-logtime",
+            "status": "Synced",
+            "message": "ingress.networking.k8s.io/np-scheduler-logtime unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          },
+          {
+            "group": "networking.k8s.io",
+            "version": "v1",
+            "kind": "Ingress",
+            "namespace": "nextpay-services",
+            "name": "np-scheduler-web",
+            "status": "Synced",
+            "message": "ingress.networking.k8s.io/np-scheduler-web unchanged",
+            "hookPhase": "Running",
+            "syncPhase": "Sync"
+          }
+        ],
+        "revision": "f836f96531d0006ad959ae32d8c9b9cf01c582f9",
+        "source": {
+          "repoURL": "https://gitlab.saobang.vn/nextpay1/nextpay-devops-management/argocd/np-scheduler-dev.git",
+          "path": ".",
+          "targetRevision": "HEAD",
+          "helm": {
+            "valueFiles": ["values-dev.yaml"],
+            "releaseName": "np-scheduler",
+            "version": "v3"
+          }
+        }
+      },
+      "startedAt": "2022-03-30T04:36:18Z",
+      "finishedAt": "2022-03-30T04:36:22Z"
+    },
+    "sourceType": "Helm",
+    "summary": {
+      "externalURLs": [
+        "http://dev-logtime.nextpay.vn/",
+        "http://dev-scheduler-api.nextpay.vn/",
+        "http://dev-scheduler.nextpay.vn/"
+      ],
+      "images": [
+        "hub.saobang.vn/nextpay/nextpay-service-np-scheduler-api:dev-cf1f89ad",
+        "hub.saobang.vn/nextpay/nextpay-service-np-scheduler-web:dev-68ffec6e",
+        "hub.saobang.vn/nextpay/np-schedule/np-scheduler-test-job:dev-866c6c7a"
+      ]
+    }
+  }
+}

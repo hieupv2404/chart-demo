@@ -1,0 +1,29 @@
+{
+    "builders": [
+        {
+            "type": "docker",
+            "image": "centos:7",
+            "privileged": true,
+            "volumes": {
+                "/sys/fs/cgroup" : "/sys/fs/cgroup"
+            },
+            "commit": true
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "ansible",
+            "user": "root",
+            "playbook_file": "postgres-master.yml"
+        }
+    ],
+    "post-processors": [
+        [
+            {
+                "type": "docker-tag",
+                "repository": "duclm2609/postgres-master",
+                "tag": "latest"
+            }
+        ]
+    ]
+}

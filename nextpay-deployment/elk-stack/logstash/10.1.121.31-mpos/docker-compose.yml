@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${TAG}
+    container_name: logstash-mpos-analysis
+    hostname: logstash.uat
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - LS_JAVA_OPTS=-Xmx2g -Xms2g
+    volumes:
+      - "./config/logstash.yml:/usr/share/logstash/config/logstash.yml"
+      - "./pipeline:/usr/share/logstash/config/pipeline"
+      - "./config/pipelines.yml:/usr/share/logstash/config/pipelines.yml"
+      - ./certs:/usr/share/logstash/config/certs
+    ports:
+      - "5045:5044"
+      - "9601:9600"
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+    healthcheck:
+      test: bin/logstash -t
+      interval: 60s
+      timeout: 50s
+      retries: 5

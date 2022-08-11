@@ -1,0 +1,29 @@
+apiVersion: flinkoperator.k8s.io/v1beta1
+kind: FlinkCluster
+metadata:
+  name: flink-facedetection-stream
+spec:
+  image:
+    name: hub.nextshop.app/nextcam/nextcam-data-pipeline:local-08
+    # name: flink:1.12.0-scala_2.11-java11
+    pullSecrets:
+      - name: hub
+  jobManager:
+    ports:
+      ui: 8081
+    resources:
+      limits:
+        memory: "1024Mi"
+        cpu: "500m"
+  taskManager:
+    replicas: 2
+    resources:
+      limits:
+        memory: "2048Mi"
+        cpu: "500m"
+  job:
+    jarFile: ./usrlib/app.jar
+    className: vn.nextcam.DataPipelineApplication
+    parallelism: 2
+  flinkProperties:
+    taskmanager.numberOfTaskSlots: "1"

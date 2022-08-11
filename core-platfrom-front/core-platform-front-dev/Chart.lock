@@ -1,0 +1,6 @@
+dependencies:
+- name: core-platform-front
+  repository: https://hub.saobang.vn/chartrepo/nextpay
+  version: 0.0.2
+digest: sha256:6f6903bd95b4fe52c5fdc5ac4746e88d13e40894277f23ba98c6cf987ff3d18c
+generated: "2021-12-31T16:52:47.9866423+07:00"

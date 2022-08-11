@@ -1,0 +1,272 @@
+next360:
+  services:
+    global:
+      imagePullSecrets: nextpay-harbor
+      image:
+        repository: hub.saobang.vn/nextpay/next360
+      elasticApm:
+        ELASTIC_APM_SERVER_URL: http://10.1.150.114:8200
+        ELASTIC_APM_ENVIRONMENT: next360-prod
+        ELASTIC_APM_ENABLED: false
+        ELASTIC_APM_ENABLE_LOG_CORRELATION: false
+    #***********************************************************************************************************************
+    #contact-list
+    contact-list:
+      enabled: false
+    #***********************************************************************************************************************
+    #npa-mamp-apmn
+    npa-mamp-apmn:
+      enabled: true
+      image:
+        name: npa-mamp-apmn
+        tag: v0.0.9
+      service:
+        type: ClusterIP
+        specs:
+          - port: 80
+            containerPort: 80 # if omit, default to port <-- this is container's port
+            name: http
+            protocol: TCP #default to TCP protocol
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          cpu: 2000m
+          memory: 1024Mi
+      ingress:
+        enabled: true
+        apiVersion: networking.k8s.io/v1beta1
+        annotations: {}
+        hosts:
+          - host: npa-mamp-apmn.nextshop.app
+            servicePort: 80
+            path: /
+            #pathType: Prefix
+      configmap:
+        #operation env
+        ELASTIC_APM_SERVICE_NAME: "npa-mamp-apmn"
+        #application env
+        HTTP_PORT: 80
+        MONGO_URI: mongodb://npservice:gw51PamwTLGTA8ENCbzz@10.99.21.224:27017/npa-mamp-apmn?authSource=admin
+        LOG_LEVEL: DEBUG
+        ROOT_LOG_LEVEL: INFO
+        SPRING_REDIS_HOST: redis-master.redis
+        SPRING_REDIS_PORT: 6379
+        APP_NAME: NPA_MAMP_APMN
+        CORE_OAUTH: https://oauth-api.nextshop.app
+        CORE_OAUTH_TOKEN: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm92aWRlckNvZGUiOiJuZXh0MzYwIiwiaWF0IjoxNjQwNTc0OTE0fQ.bk-P2oBItf_TLnDsKzZuupa1GxcUm0Ji-2jYhYbLQ8LJL0TiN4845piqTWrnwxuR5_vqBtY8WsnX4QgwlrUe_0OLqoqsfWBu5BuOIPvOXrlhx7heWL9hflP1ysRT15Zq3Pi7jD0Yx2_0LyOCxpUGGAbe6fkZDZbWjub7LRBLk9bgAeSPTJq8BAfMkBXJRJz6wLZJPwDtcyl6ZDXSRWFhCgpYpAusB4nI-QyBDc5-vZ_Xwhwi2Z2rJuZI63tyCDkwS5p9U6N4uWgVwd_bYrM-IWbMqGbRkf-RiwsU1ATAgHZ8ie8bQLX8Aqc2Mgw9oIQ4qwfpNtIdix88eZ0Ict0hcy0UG0TDVz3tDq8ARFI-lnwOsjyXDjVaBr_L9krVI9LSrYVIlGps6Ddy-_3M06bcgZaMm06zScnkmd1JcAU24zgl0JNgZwKpvTM-tv6Q-mH4rCqwdeoiHU3i5OgLML65VLCzWeFPAVVopMCgPgMlaBIyjmK1wz6sXKY7W2Lv3pXap1KfONkc_4uM_SdphfmPTST6V_QtXP2EFpIc5d1oIYTByirjNbcUTeuw0JKZUJCReDf0QbnoSgz3zyV29eQrPKZDQNMhJmmGMtPDH3FpexwcpaqowQF1hcpH8OvEz2M8mzktT0HSimSPKheKvzwZ0A3DMhIqqWjmzjld9_et8rg
+        PUBLIC_KEY: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FEV2QzNHZWZ1RPNXUvOUFMaUpKRjF6UDlMNgpsVm1HU1dFZWN0ZWdsVHFZWDIySkx3aklrTmQySzBLVjUzTWVoY3J5dHlUR1FtdWYyZGQzMDl0Y2hBSGp0ZmV6Ck43Tkwzckcwek5ReDdBM3dJVi9IaDRlU0g4OWF1S2JJeFNxaWl2MFJ2a2ZYMmZ3N0ZDQzBlb0tsVWExM1NDb3oKZTJXNTJsaUZsU1M1RFRwT1d3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+        PRIVATE_KEY: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlDWFFJQkFBS0JnUURXZDM0dlZnVE81dS85QUxpSkpGMXpQOUw2bFZtR1NXRWVjdGVnbFRxWVgyMkpMd2pJCmtOZDJLMEtWNTNNZWhjcnl0eVRHUW11ZjJkZDMwOXRjaEFIanRmZXpON05MM3JHMHpOUXg3QTN3SVYvSGg0ZVMKSDg5YXVLYkl4U3FpaXYwUnZrZlgyZnc3RkNDMGVvS2xVYTEzU0NvemUyVzUybGlGbFNTNURUcE9Xd0lEQVFBQgpBb0dCQUpTVVJpUlBLSmVhb0dxY0JEeG1xQ00rOVZCTEJiR2x4cFhNcEJ3SkpvWUhucUFxcUtBaTBGSjZsKys0CllDV21OVHEvck1kNW5vd281RUNNMG0wZXV4c2NUYnFNYTdSa2RXaTB3VHMzR1ozL2tMYzV3RDdYSmV2UnRlMDMKMS9oZ0o4bTNwWXBvaTMzWndCeDFDQmJvQWhZYjZXQ0NhUG9hbm45ZVVZWlBJQW5oQWtFQStnWHVqSzRxM3FMZgo3eU5kRElGb0ZPNE5ZVEtOQTZ1dEVscTc2Wk9BZ2JwQWkyRHFrcVBPQXhrZkhQMHBqSXBnZmVWaC9RMGpXL0RJCnliVlJrVm84S3dKQkFOdVg5MlBqNkpaUkRiTTNrb2toVnVGN05reUVyd0Q0STRvSjg2VG9mUFJlclYxSXp4L0QKc3l4R1NYQWFQR1pNb0Z4K0FDUWo2VDFPZTdIZkRWc3JycEVDUUUwVjh4eXd2a3J5VUxTOFpIM3NrQmlUNU5Bbwo4ODFENnhLVG93ZzdFQTN2VE9Nc09HYUoxb1NpQkRPOTRrZVFpbnVHYzVXL3JUMDFtZEtHOHVVcnV3MENRUUMxCmVSRHBiQjk2bWVGSWlsUi9IeDQ5bVNWMmR2QnBUS2VTSEVkTnNSUVNuMnVGKy9XdnVuc0h5ODVFNW1tajRROWwKWUh1ZFlsQU9haDJ2RVRab2NlRUJBa0J2aHRVSUcxclQ4cnI3T0xCQytPZmUrNC93WDRUOFNvWnEzNVFwdEt1ZAp5bTJaT2ZJRit1UEQwOVBqV0R2VW1iR1ZJQUdaeTZuWCs1RVVXSFJPRHNpMAotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+        CORE_MERCHANT_URL: https://api.nextshop.app/merchant
+        CORE_TOKEN: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZXMiOlsiT1JERVJfV1JJVEUiLCJPUkRFUl9SRUFEIiwiUFJPRFVDVF9XUklURSIsIlBST0RVQ1RfUkVBRCIsIlVTRVJfUkVBRCIsIlVTRVJfV1JJVEUiLCJNRVJDSEFOVF9SRUFEIiwiTUVSQ0hBTlRfV1JJVEUiLCJQUk9GSUxFX1dSSVRFIiwiUFJPRklMRV9SRUFEIiwiQ09fQ0FURUdPUllfV1JJVEUiLCJDT19DQVRFR09SWV9SRUFEIiwiQ09fQ0FURUdPUllfREVMRVRFIiwiQ09fQ0FURUdPUllfU1BFQ0lBTCIsIkNPX1RBWF9XUklURSIsIkNPX1RBWF9SRUFEIiwiQ09fVEFYX0RFTEVURSIsIkNPX1RBWF9TUEVDSUFMIiwiQ09fVEFYX0lURU1fV1JJVEUiLCJDT19UQVhfSVRFTV9SRUFEIiwiQ09fVEFYX0lURU1fREVMRVRFIiwiQ09fVEFYX0lURU1fU1BFQ0lBTCIsIkNPX1BBUlRORVJfV1JJVEUiLCJDT19QQVJUTkVSX1JFQUQiLCJDT19QQVJUTkVSX0RFTEVURSIsIkNPX1BBUlRORVJfU1BFQ0lBTCIsIkNPX0RFQlROT1RFX1dSSVRFIiwiQ09fREVCVE5PVEVfUkVBRCIsIkNPX0RFQlROT1RFX0RFTEVURSIsIkNPX0RFQlROT1RFX1NQRUNJQUwiLCJDT19ESVNDT1VOVF9XUklURSIsIkNPX0RJU0NPVU5UX1JFQUQiLCJDT19ESVNDT1VOVF9ERUxFVEUiLCJDT19ESVNDT1VOVF9TUEVDSUFMIiwiQ09fRElTQ09VTlRfUlVMRV9XUklURSIsIkNPX0RJU0NPVU5UX1JVTEVfUkVBRCIsIkNPX0RJU0NPVU5UX1JVTEVfREVMRVRFIiwiQ09fRElTQ09VTlRfUlVMRV9TUEVDSUFMIiwiQ09fSU5WRU5UT1JZX1dSSVRFIiwiQ09fSU5WRU5UT1JZX0lURU1fV1JJVEUiLCJDT19JTlZFTlRPUllfUkVBRCIsIkNPX0lOVkVOVE9SWV9JVEVNX1JFQUQiLCJDT19JTlZFTlRPUllfREVMRVRFIiwiQ09fSU5WRU5UT1JZX0lURU1fREVMRVRFIiwiQ09fSU5WRU5UT1JZX1NQRUNJQUwiLCJDT19BQ0NPVU5UX1dSSVRFIiwiQ09fQUNDT1VOVF9FTlRSWV9XUklURSIsIkNPX0FDQ09VTlRfUkVBRCIsIkNPX0FDQ09VTlRfRU5UUllfUkVBRCIsIkNPX0FDQ09VTlRfREVMRVRFIiwiQ09fQUNDT1VOVF9TUEVDSUFMIiwiQ09fSVRFTV9XUklURSIsIkNPX0lURU1fUkVBRCIsIkNPX0lURU1fREVMRVRFIiwiQ09fSVRFTV9TUEVDSUFMIiwiQ09fSVRFTV9QUklDRV9XUklURSIsIkNPX0lURU1fUFJJQ0VfUkVBRCIsIkNPX0lURU1fUFJJQ0VfREVMRVRFIiwiQ09fSVRFTV9QUklDRV9TUEVDSUFMIiwiQ09fSVRFTV9DT01QT1VORF9XUklURSIsIkNPX0lURU1fQ09NUE9VTkRfUkVBRCIsIkNPX0lURU1fQ09NUE9VTkRfU1BFQ0lBTCJdLCJwZXJtaXNzaW9ucyI6W10sImFwcElkIjoiNWVmZWYyMGM0NTIxZmQzYWFhYmY0MTk3Iiwib3duZXJJZCI6IjVmYWNiODIyYzQyMDVlMDAxMTI2NmQ1YSIsImlhdCI6MTYwOTIxNzMyNX0.GQScZS5S0x8ys4bxXzjkve_RSvZajyXtCl4T9v_WssO7lGD1LnHGZK3WeN5y6qm9DquzYV5Gp8bGPPOqMwAkB8RCt_LzNVZbbOnFSFNylO_Am2jRVQzA2ULXySU5yR3eDg7NNMflEDBqbu0_JE0vLU9bsOVDbH4O-VB0pWuVerc
+        MPOS_API_URL: https://api.mpos.vn/api
+    #***********************************************************************************************************************
+    #npa-n360-common
+    npa-n360-common:
+      enabled: false
+    #***********************************************************************************************************************
+    #admin-next360-vn
+    admin-next360-vn:
+      enabled: false
+    #***********************************************************************************************************************
+    #npa-n360-report
+    npa-n360-report:
+      enabled: false
+    #***********************************************************************************************************************
+    #npa-n360-mcmnt
+    npa-n360-mcmnt:
+      enabled: true
+      image:
+        name: npa-n360-mcmnt
+        tag: v0.1.14
+      service:
+        type: ClusterIP
+        specs:
+          - port: 80
+            containerPort: 80 # if omit, default to port <-- this is container's port
+            name: http
+            protocol: TCP #default to TCP protocol
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      configmap:
+        #operation env
+        ELASTIC_APM_SERVICE_NAME: "npa-n360-mcmnt"
+        #application env
+        SERVER_PORT: 80
+        PUBLIC_KEY: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FEV2QzNHZWZ1RPNXUvOUFMaUpKRjF6UDlMNgpsVm1HU1dFZWN0ZWdsVHFZWDIySkx3aklrTmQySzBLVjUzTWVoY3J5dHlUR1FtdWYyZGQzMDl0Y2hBSGp0ZmV6Ck43Tkwzckcwek5ReDdBM3dJVi9IaDRlU0g4OWF1S2JJeFNxaWl2MFJ2a2ZYMmZ3N0ZDQzBlb0tsVWExM1NDb3oKZTJXNTJsaUZsU1M1RFRwT1d3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+        MONGO_URI: mongodb://npservice:gw51PamwTLGTA8ENCbzz@10.99.21.224:27017/npa-next360-merchantManagement?authSource=admin
+        LOGGING_LEVEL: debug
+    #***********************************************************************************************************************
+    #marketplace-web
+    marketplace-web:
+      image:
+        name: marketplace-web
+        tag: v0.0.2
+      service:
+        type: ClusterIP
+        specs:
+          - port: 80
+            containerPort: 80 # if omit, default to port <-- this is container's port
+            name: http
+            protocol: TCP #default to TCP protocol
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 200m
+          memory: 512Mi
+      ingress:
+        enabled: true
+        apiVersion: networking.k8s.io/v1beta1
+        annotations: {}
+        hosts:
+          - host: marketplace.next360.vn
+            servicePort: 80
+            path: /
+            #pathType: Prefix
+      configmap:
+        #operation env
+        ELASTIC_APM_SERVICE_NAME: "marketplace-web"
+    #***********************************************************************************************************************
+    #npa-n360-portal
+    npa-n360-portal:
+      replicaCount: "0"
+      image:
+        name: npa-n360-portal
+        tag: dev-e80a384e
+      service:
+        type: ClusterIP
+        specs:
+          - port: 80
+            containerPort: 80 # if omit, default to port <-- this is container's port
+            name: http
+            protocol: TCP #default to TCP protocol
+      resources:
+        limits:
+          memory: 1024Mi
+          cpu: 2000m
+        requests:
+          memory: 512Mi
+          cpu: 250m
+      configmap:
+        #operation env
+        ELASTIC_APM_SERVICE_NAME: npa-n360-portal
+        #application env
+        HTTP_PORT: 80
+    #***********************************************************************************************************************
+    #npa-n360-portal-web
+    npa-n360-portal-web:
+      image:
+        name: npa-n360-portal-web
+        tag: dev-03023588
+      service:
+        type: ClusterIP
+        specs:
+          - port: 8080
+            containerPort: 3000 # if omit, default to port <-- this is container's port
+            name: http
+            protocol: TCP #default to TCP protocol
+      resources:
+        limits:
+          memory: 1024Mi
+          cpu: 2000m
+        requests:
+          memory: 512Mi
+          cpu: 250m
+      ingress:
+        enabled: true
+        annotations: {}
+        hosts:
+          - host: admin-portal.nextshop.app
+            servicePort: 8080
+            path: /
+            pathType: Prefix
+      configmap:
+        #operation env
+        ELASTIC_APM_SERVICE_NAME: npa-n360-portal-web
+        ELASTIC_APM_APPLICATION_PACKAGES: vn.nextpay
+        #application env
+        HTTP_PORT: 8080
+        BASE_API_URL: https://npa-n360-portal.nextshop.app/api
+        hey: abcxyzasdmajkbdask
+    #***********************************************************************************************************************
+    #npa-n360-pmo
+    npa-n360-pmo:
+      image:
+        name: npa-n360-pmo
+        tag: v0.0.1
+      service:
+        type: ClusterIP
+        specs:
+          - port: 8080
+            containerPort: 8080 # if omit, default to port <-- this is container's port
+            name: http
+            protocol: TCP #default to TCP protocol
+      # resources:
+      #   limits:
+      #     memory: 1024Mi
+      #     cpu: 2000m
+      #   requests:
+      #     memory: 512Mi
+      #     cpu: 250m
+      configmap:
+        #operation env
+        ELASTIC_APM_SERVICE_NAME: npa-n360-pmo
+        ELASTIC_APM_APPLICATION_PACKAGES: vn.nextpay
+        #application env
+        HTTP_PORT: 8080
+        LOG_LEVEL: DEBUG
+        PUBLIC_KEY: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FEV2QzNHZWZ1RPNXUvOUFMaUpKRjF6UDlMNgpsVm1HU1dFZWN0ZWdsVHFZWDIySkx3aklrTmQySzBLVjUzTWVoY3J5dHlUR1FtdWYyZGQzMDl0Y2hBSGp0ZmV6Ck43Tkwzckcwek5ReDdBM3dJVi9IaDRlU0g4OWF1S2JJeFNxaWl2MFJ2a2ZYMmZ3N0ZDQzBlb0tsVWExM1NDb3oKZTJXNTJsaUZsU1M1RFRwT1d3SURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=
+        ENVIRONMENT: CUSTOM
+        #database
+        MONGO_URI: mongodb://npservice:gw51PamwTLGTA8ENCbzz@10.99.21.224:27017/npa-n360-pmo?authSource=admin
+        #url
+        CORE_GATEWAY: https://npa-api-gateway.nextshop.app/proxy-gateway/gw-core
+        PAY_ON_URL: https://sdk.payon.vn/v1/merchant
+        GATEWAY_URL: https://npa-api-gateway.nextshop.app
+    #***********************************************************************************************************************
+    #npa-n360-pmoweb
+    npa-n360-pmoweb:
+      image:
+        name: npa-n360-pmoweb
+        tag: v0.0.3
+      service:
+        type: ClusterIP
+        specs:
+          - port: 8080
+            containerPort: 8080 # if omit, default to port <-- this is container's port
+            name: http
+            protocol: TCP #default to TCP protocol
+      # resources:
+      #   limits:
+      #     memory: 1024Mi
+      #     cpu: 2000m
+      #   requests:
+      #     memory: 512Mi
+      #     cpu: 250m
+      ingress:
+        enabled: true
+        apiVersion: networking.k8s.io/v1beta1
+        annotations: {}
+        hosts:
+          - host: pmo.nextshop.app
+            servicePort: 8080
+            path: /
+            pathType: Prefix
+      configmap:
+        #operation env
+        ELASTIC_APM_SERVICE_NAME: npa-n360-pmoweb
+        ELASTIC_APM_APPLICATION_PACKAGES: vn.nextpay
+        #application env
+        VUE_APP_NEXT360_URL: https://npa-api-gateway.nextshop.app/n360/pmo
+        VUE_APP_NEXT360_TOKEN: eyJhbGciOiJSUzI1NiJ9.eyJBUFBfUEFSRU5UX0lEIjoiNWVmZWYyMGM0NTIxZmQzYWFhYmY0MTk3IiwiUEVSTUlTU0lPTlMiOltdLCJVU0VSX0lEIjoiNjEyYzk1OGZjNzUyN2IwMDE4MTkzMzBlIiwiZXhwIjoxNjY5MzU2NzM0LCJpYXQiOjE2Mzc4MjA3MzQsIk1FUkNIQU5UX0lEIjoiNjEyYzk2NDEyOGRhZDcwMDExM2Y1ZWI4In0.bcyZg48i5yBy3wGhugP3ZkEBkOFF5q4moD_WZ0ut_pi3RK792V3HE-qwoCMrOdJjHp2pHk78Pt0UXe5iNkJflcKDTMBFJBJQZVeF5_jtHWW0kVa14z2UHsgu2Oxm1JsiOEO0sElbxemLERpvAGM4hihie4p7JgjECEKTRhr9D3A
+        VUE_PORT: 8080
+  mongodb:
+    enabled: false

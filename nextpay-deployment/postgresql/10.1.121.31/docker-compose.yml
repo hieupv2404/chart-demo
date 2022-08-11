@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    container_name: postgres
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+      POSTGRES_PASSWORD: 123456a@
+      POSTGRES_USER: vipost
+      POSTGRES_DB: vipost
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_dbData:/var/lib/postgresql/data
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=duclm@vimo.vn
+      - PGADMIN_DEFAULT_PASSWORD=12345678
+    ports:
+      - 6789:80
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+
+networks:
+  default:
+    external:
+      name: uat-docker-network
+
+volumes:
+  pgadmin:
+  postgresql_dbData:
+    external: true

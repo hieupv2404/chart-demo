@@ -1,0 +1,3 @@
+- pipeline.id: mpos-analysis
+  path.config: "/usr/share/logstash/config/pipeline/02-mpos-analysis.conf"
+  pipeline.workers: 1

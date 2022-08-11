@@ -1,0 +1,8 @@
+- type: log
+  paths:
+    - /var/logs/vimo_web/AppLog*.txt
+    - /var/logs/vimo_web/Log-Api*.txt
+  fields:
+    project:
+      name: vipost
+  encoding: utf-8

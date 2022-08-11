@@ -1,0 +1,8 @@
+- type: log
+  paths: 
+    - /var/logs/mpos-portal/mpos-portal.log
+  fields:
+    log_type: mpos-portal-staging
+  scan_frequency: 5s
+  encoding: utf-8
+  json.keys_under_root: true

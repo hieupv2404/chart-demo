@@ -1,0 +1,19 @@
+version: "3"
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${TAG}
+    container_name: filebeat
+    hostname: ${HOSTNAME:?err}
+    user: root # for adding docker metadata to processors
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    command: --strict.perms=false -e # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./inputs.d/:/usr/share/filebeat/inputs.d/:ro
+      - /var/log/nginx/:/var/logs/nginx/:ro
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file

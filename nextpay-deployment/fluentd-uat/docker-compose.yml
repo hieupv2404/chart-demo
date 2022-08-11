@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  fluentd:
+    build: .
+    container_name: fluentd
+    volumes:
+      - ./conf:/fluentd/etc
+      - buffer:/var/log/fluent
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "256m"
+        max-file: "1"
+
+volumes:
+  buffer: 

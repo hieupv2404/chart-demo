@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine-v11.11.1
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - config:/etc/gitlab-runner:Z
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  gitlab-runner-mpos:
+    image: gitlab/gitlab-runner:alpine-v11.11.1
+    container_name: gitlab-runner-mpos
+    restart: always
+    volumes:
+      - config_mpos:/etc/gitlab-runner:Z
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  config:
+  config_mpos:
+
+networks:
+  default:
+    external:
+      name: vimo-uat-network

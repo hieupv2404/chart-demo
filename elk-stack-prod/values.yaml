@@ -1,0 +1,1312 @@
+es-master-node:
+  elasticsearch:
+    enabled: false
+    image: hub.saobang.vn/nextpay/elasticsearch
+    imageTag: v7.16.2@sha256:92795204f6235d52903a1eda5b39ee3037d0fc2d2f7e3421365b12c82193b104
+    imagePullSecrets:
+      - name: nextpay-registry
+    replicas: 3
+    resources:
+      requests:
+        cpu: "2000m"
+        memory: "4Gi"
+      limits:
+        cpu: "2000m"
+        memory: "4Gi"
+    clusterName: nextpay-monitoring
+    nodeGroup: "master"
+    roles:
+      master: "true"
+      ingest: "false"
+      data: "false"
+      ml: "false"
+      remote_cluster_client: "true"
+    secretMounts:
+      - name: elastic-certificates
+        secretName: elastic-certificates
+        path: /usr/share/elasticsearch/config/certs
+    extraEnvs:
+      - name: "TZ"
+        value: "Asia/Ho_Chi_Minh"
+      - name: "ELASTIC_PASSWORD"
+        valueFrom:
+          secretKeyRef:
+            name: elastic-credentials
+            key: password
+    persistence:
+      enabled: true
+    volumeClaimTemplate:
+      storageClassName: "cstor-csi-disk"
+      resources:
+        requests:
+          storage: 10Gi
+    tests:
+      enabled: false
+    clusterHealthCheckParams: wait_for_status=yellow&timeout=1s
+    protocol: https
+    esConfig:
+      elasticsearch.yml: |
+        network.host: 0.0.0.0
+        xpack.security.enabled: true
+        xpack.security.transport.ssl.enabled: true
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+        xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+        xpack.security.http.ssl.enabled: true
+        xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+        xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+es-data-node:
+  elasticsearch:
+    image: hub.saobang.vn/nextpay/elasticsearch
+    imageTag: v7.16.2@sha256:92795204f6235d52903a1eda5b39ee3037d0fc2d2f7e3421365b12c82193b104
+    imagePullSecrets:
+      - name: nextpay-registry
+    replicas: 2
+    resources:
+      requests:
+        cpu: "10000m"
+        memory: "22Gi"
+      limits:
+        cpu: "10000m"
+        memory: "22Gi"
+    service:
+      type: NodePort
+      nodePort: 30004
+    nodeGroup: "data"
+    roles:
+      master: "false"
+      ingest: "true"
+      data: "true"
+      ml: "true"
+      remote_cluster_client: "true"
+    clusterName: nextpay-monitoring
+    secretMounts:
+      - name: elastic-certificates
+        secretName: elastic-certificates
+        path: /usr/share/elasticsearch/config/certs
+    extraEnvs:
+      - name: "TZ"
+        value: "Asia/Ho_Chi_Minh"
+      - name: "ELASTIC_PASSWORD"
+        valueFrom:
+          secretKeyRef:
+            name: elastic-credentials
+            key: password
+    persistence:
+      enabled: true
+    volumeClaimTemplate:
+      storageClassName: "openebs-lvm"
+      resources:
+        requests:
+          storage: 995Gi
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: nextpay.vn/application
+                operator: In
+                values:
+                  - elk-stack
+    tolerations:
+      - key: "nextpay.vn/application"
+        operator: "Equal"
+        value: "elk-stack"
+        effect: "NoSchedule"
+      - key: "elasticsearch.nextpay.vn/role"
+        operator: "Equal"
+        value: "data"
+        effect: "NoSchedule"
+    tests:
+      enabled: false
+    clusterHealthCheckParams: wait_for_status=yellow&timeout=1s
+    protocol: https
+    esConfig:
+      elasticsearch.yml: |
+        network.host: 0.0.0.0
+        xpack.security.enabled: true
+        xpack.security.transport.ssl.enabled: true
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+        xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+        xpack.security.http.ssl.enabled: true
+        xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+        xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+kibana:
+  nameOverride: kibana
+  fullnameOverride: kibana
+  extraEnvs:
+    - name: "TZ"
+      value: "Asia/Ho_Chi_Minh"
+    - name: "ELASTICSEARCH_USERNAME"
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: username
+    - name: "ELASTICSEARCH_PASSWORD"
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: password
+  extraVolumeMounts:
+    - name: node-option-config
+      mountPath: /usr/share/kibana/config/node.options
+      subPath: node.options
+      readOnly: true
+  secretMounts:
+    - name: elastic-certificates
+      secretName: elastic-certificates
+      path: /usr/share/kibana/config/certs/elastic
+    - name: nextpay-cert
+      secretName: nextpay-cert
+      path: /usr/share/kibana/config/certs/server
+  extraVolumes:
+    - name: node-option-config
+      configMap:
+        name: kibana-node-options-config
+        items:
+          - key: node.options
+            path: node.options
+  resources:
+    requests:
+      cpu: "2000m"
+      memory: "3Gi"
+    limits:
+      cpu: "2000m"
+      memory: "3Gi"
+  ingress:
+    enabled: true
+    className: "nginx"
+    pathtype: Prefix
+    annotations:
+      nginx.ingress.kubernetes.io/whitelist-source-range: "183.91.7.129,183.91.4.105,101.99.7.213,101.99.7.132,14.177.239.192,14.177.239.203,14.177.239.244"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    hosts:
+      - host: cloudwatch.nextpay.vn
+        paths:
+          - path: /
+    tls:
+      - secretName: nextpay-cert
+        hosts:
+          - cloudwatch.nextpay.vn
+  elasticsearchHosts: https://nextpay-monitoring-master:9200
+  protocol: https
+  kibanaConfig:
+    kibana.yml: |
+      server:
+        publicBaseUrl: https://cloudwatch.nextpay.vn
+        ssl:
+          enabled: true
+          certificate: /usr/share/kibana/config/certs/server/tls.crt
+          key: /usr/share/kibana/config/certs/server/tls.key
+      elasticsearch:
+        ssl:
+          verificationMode: certificate
+          certificateAuthorities: /usr/share/kibana/config/certs/elastic/elastic-certificate.pem
+      xpack:
+        encryptedSavedObjects:
+          encryptionKey: "HPXVMCny!E*Mvw6M9WXWp-2ks3*4VRnW"
+        monitoring:
+          collection:
+            enabled: true
+      monitoring:
+        kibana:
+          collection:
+            enabled: false
+logstash:
+  replicas: 2
+  nameOverride: logstash
+  fullnameOverride: logstash
+  secretMounts:
+    - name: elastic-certificates
+      secretName: elastic-certificates
+      path: /usr/share/logstash/config/certs
+  extraEnvs:
+    - name: "TZ"
+      value: "Asia/Ho_Chi_Minh"
+    - name: "ELASTICSEARCH_USERNAME"
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: username
+    - name: "ELASTICSEARCH_PASSWORD"
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: password
+  service:
+    type: NodePort
+    ports:
+      - name: http
+        port: 9600
+        protocol: TCP
+        targetPort: 9600
+        nodePort: 30001
+      - name: beats
+        port: 5044
+        protocol: TCP
+        targetPort: 5044
+        nodePort: 30002
+  resources:
+    requests:
+      cpu: "3000m"
+      memory: "5Gi"
+    limits:
+      cpu: "3000m"
+      memory: "5Gi"
+  persistence:
+    enabled: true
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: 30Gi
+    storageClassName: "cstor-csi-disk"
+  logstashJavaOpts: "-Xmx4g -Xms4g"
+  logstashConfig:
+    logstash.yml: |
+      http.host: 0.0.0.0
+      monitoring.enabled: false
+      monitoring.cluster_uuid: Zib9N5G6S9OzmkYmqA_2Kw
+      xpack.monitoring.enabled: false
+      pipeline.ecs_compatibility: disabled
+    pipelines.yml: |
+      - pipeline.id: intake
+        path.config: "/usr/share/logstash/pipeline/logstash.conf"
+        pipeline.workers: 10
+      - pipeline.id: elk-stack
+        path.config: "/usr/share/logstash/pipeline/elk-stack.conf"
+      - pipeline.id: mpos
+        path.config: "/usr/share/logstash/pipeline/mpos.conf"
+      - pipeline.id: mpos-media
+        path.config: "/usr/share/logstash/pipeline/mpos-media.conf"
+      - pipeline.id: payment-gateway-stg
+        path.config: "/usr/share/logstash/pipeline/payment-gateway-stg.conf"
+      - pipeline.id: mpos-export
+        path.config: "/usr/share/logstash/pipeline/mpos-export.conf"
+      - pipeline.id: mpos-portal
+        path.config: "/usr/share/logstash/pipeline/mpos-portal.conf"
+      - pipeline.id: mpos-api
+        path.config: "/usr/share/logstash/pipeline/mpos-api.conf"
+      - pipeline.id: baoviet-api
+        path.config: "/usr/share/logstash/pipeline/baoviet-api.conf"
+      - pipeline.id: mpos-mobile
+        path.config: "/usr/share/logstash/pipeline/mpos-mobile.conf"
+      - pipeline.id: multi-acquirer
+        path.config: "/usr/share/logstash/pipeline/multi-acquirer.conf"
+      - pipeline.id: nextlend
+        path.config: "/usr/share/logstash/pipeline/nextlend.conf"
+      - pipeline.id: vipost
+        path.config: "/usr/share/logstash/pipeline/vipost.conf"
+      - pipeline.id: vipost-core
+        path.config: "/usr/share/logstash/pipeline/vipost-core.conf"
+      - pipeline.id: vimo
+        path.config: "/usr/share/logstash/pipeline/vimo.conf"
+      - pipeline.id: vimo-work
+        path.config: "/usr/share/logstash/pipeline/vimo-work.conf"
+      - pipeline.id: payon
+        path.config: "/usr/share/logstash/pipeline/payon.conf"
+      - pipeline.id: billing-gateway
+        path.config: "/usr/share/logstash/pipeline/billing-gateway.conf"
+      - pipeline.id: mysql-billgate
+        path.config: "/usr/share/logstash/pipeline/mysql-billgate.conf"
+      - pipeline.id: nginx-36-10
+        path.config: "/usr/share/logstash/pipeline/nginx_36_10.conf"
+      - pipeline.id: mongodb-macq
+        path.config: "/usr/share/logstash/pipeline/mongodb-macq.conf"
+      - pipeline.id: fallback
+        path.config: "/usr/share/logstash/pipeline/fallback.conf"
+  logstashPipeline:
+    logstash.conf: |
+      input {
+        beats {
+          port => 5044
+        }
+      }
+      output {
+        if [kubernetes][namespace] == "elk" {
+          pipeline { send_to => "elk" }
+        } else if [kubernetes][namespace] == "mpos" {
+          pipeline { send_to => "mpos" }
+        } else if [fields][project][name] == "mpos-mobile"  {
+          pipeline { send_to => "mpos-mobile" }
+        } else if ([kubernetes][namespace] == "multi-acquirer" or [kubernetes][container][name] == "macq-background-service") {
+          pipeline { send_to => "multi-acquirer" }
+        } else if [fields][project][name] == "mpos-media" {
+          pipeline { send_to => "mpos-media" }
+        } else if [project][name] == "payment-gateway-stg" {
+          pipeline { send_to => "payment-gateway-stg" }
+        } else if [fields][project][name] == "mpos-export" {
+          pipeline { send_to => "mpos-export" }
+        } else if [kubernetes][namespace] == "multi-acquirer" {
+          pipeline { send_to => "multi-acquirer" }
+        } else if [fields][project][name] == "mpos" {
+          pipeline { send_to => "mpos-portal" }
+        } else if [fields][project][name] == "mpos-api" {
+          pipeline { send_to => "mpos-api" }
+        } else if [fields][project][name] == "baoviet-api" {
+          pipeline { send_to => "baoviet-api" }
+        } else if [kubernetes][namespace] == "nextlend" {
+          pipeline { send_to => "nextlend" }
+        } else if [fields][project][name] == "vipost" {
+          pipeline { send_to => "vipost" }
+        } else if [fields][project][name] == "vimo" {
+          pipeline { send_to => "vimo" }
+        } else if [kubernetes][namespace] == "vimo-work" {
+          pipeline { send_to => "vimo-work" }
+        } else if [project][name] == "payon" {
+          pipeline { send_to => "payon" }
+        } else if [project][name] == "billing-gateway" {
+          pipeline { send_to => "billing-gateway" }
+        } else if [project][name] == "vipost-core" {
+          pipeline { send_to => "vipost-core" }
+        } else if [project][name] == "mysql-billgate" {
+          pipeline { send_to => "mysql-billgate" }
+        } else if [fields][nginx][server] == "36-10" {
+          pipeline { send_to => "nginx-36-10" }
+        } else if [fields][pipeline] == "mongodb-macq" {
+          pipeline { send_to => "mongodb-macq" }
+        } else {
+          pipeline { send_to => "fallback" }
+        }
+      }
+    elk-stack.conf: |
+      input { pipeline { address => "elk" } }
+      filter {
+        if [kubernetes][container][name] == "elasticsearch" {
+          json {
+            source => "message"
+            skip_on_invalid_json => "true"
+          }
+        } else { drop {} }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "elk"
+          data_stream_namespace => "prod"
+        }
+      }
+    mpos.conf: |
+      input { pipeline { address => "mpos" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mpos"
+          data_stream_namespace => "prod"
+        }
+      }
+    mpos-media.conf: |
+      input { pipeline { address => "mpos-media" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mpos-media"
+          data_stream_namespace => "prod"
+        }
+      }
+    payment-gateway-stg.conf: |
+      input { pipeline { address => "payment-gateway-stg" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "payment-gateway"
+          data_stream_namespace => "staging"
+        }
+      }
+    mpos-export.conf: |
+      input { pipeline { address => "mpos-export" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mpos-export"
+          data_stream_namespace => "prod"
+        }
+      }
+    mpos-portal.conf: |
+      input { pipeline { address => "mpos-portal" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mpos-portal"
+          data_stream_namespace => "prod"
+        }
+      }
+    mpos-api.conf: |
+      input { pipeline { address => "mpos-api" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mpos-api"
+          data_stream_namespace => "prod"
+        }
+      }
+    baoviet-api.conf: |
+      input { pipeline { address => "baoviet-api" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "baoviet-api"
+          data_stream_namespace => "prod"
+        }
+      }
+    vimo.conf: |
+      input { pipeline { address => "vimo" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "vimo"
+          data_stream_namespace => "prod"
+        }
+      }
+    vimo-work.conf: |
+      input { pipeline { address => "vimo-work" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "vimo-work"
+          data_stream_namespace => "prod"
+        }
+      }
+    payon.conf: |
+      input { pipeline { address => "payon" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "payon"
+          data_stream_namespace => "prod"
+        }
+      }
+    billing-gateway.conf: |
+      input { pipeline { address => "billing-gateway" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "billing-gateway"
+          data_stream_namespace => "prod"
+        }
+      }
+    mysql-billgate.conf: |
+      input { pipeline { address => "mysql-billgate" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        grok { 
+          match => { 
+            "message" => "Query_time: %{NUMBER:query_time:float}" 
+          } 
+        }
+        date {
+          match => ["timestamp", "ISO8601"]
+          remove_field => [ "timestamp" ]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mysql-billgate"
+          data_stream_namespace => "prod"
+        }
+      }
+    mpos-mobile.conf: |
+      input {
+        pipeline {
+          address => "mpos-mobile"
+        }
+      }
+      filter {
+        grok {
+          match => {
+            "message" => "%{WORD:mobile_os}-*%{DATESTAMP:log_timestamp}-*?"
+          }
+        }
+        date {
+          match => ["log_timestamp", "dd-MM-yyyy HH:mm:ss"]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mpos-mobile"
+          data_stream_namespace => "prod"
+        }
+      }
+    multi-acquirer.conf: |
+      input { pipeline { address => "multi-acquirer" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "multi-acquirer"
+          data_stream_namespace => "prod"
+        }
+      }
+    nextlend.conf: |
+      input { pipeline { address => "nextlend" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "nextlend"
+          data_stream_namespace => "prod"
+        }
+      }
+    nginx_36_10.conf: |
+      input { pipeline { address => "nginx-36-10" } }
+      filter {
+        grok {
+          match => {
+            "message" => "%{IPORHOST:remote_addr} - %{USERNAME:remote_user} \[%{HTTPDATE:time_local}\] \"%{WORD:method}\ %{URIPATHPARAM:request} %{DATA:protocol}\" %{INT:status} %{NUMBER:bytes_sent} \"%{DATA:http_referer}\" \"%{DATA:http_user_agent}\" %{HOSTNAME:host} %{NUMBER:timestamp} %{NUMBER:request_time}"
+          }
+        }
+        date {
+          match  => [ "time_local", "dd/MMM/YYYY:HH:mm:ss Z" ]
+          locale => "en"
+          remove_field => ["time_local", "timestamp"]
+        }
+        mutate {
+          convert => {
+            "request_time" => "float"
+          }
+        }
+        geoip {
+          source => "[remote_addr]"
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "vipost-36-10"
+          data_stream_namespace => "nginx"
+        }
+      }
+    vipost.conf: |
+      input { pipeline { address => "vipost" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        if [service] in ["vipost-core", "vipost-report", "vipost-portal-api", "vipost-pay-off", "vipost-sync-error", "vipost-sync-orders"] {
+          date {
+              match => ["timestamp", "ISO8601"]
+              remove_field => [ "timestamp" ]
+          }
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "vipost"
+          data_stream_namespace => "prod"
+        }
+      }
+    vipost-core.conf: |
+      input { pipeline { address => "vipost-core" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "vipost-core"
+          data_stream_namespace => "prod"
+        }
+      }
+    mongodb-macq.conf: |
+      input { pipeline { address => "mongodb-macq" } }
+      filter {
+        json {
+          source => "message"
+          skip_on_invalid_json => "true"
+        }
+        date {
+          match => ["[t][$date]", "ISO8601"]
+        }
+      }
+      output {
+        elasticsearch {
+          hosts => ["https://nextpay-monitoring-data:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          ssl_certificate_verification => "false"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          data_stream => "true"
+          data_stream_type => "logs"
+          data_stream_dataset => "mongodb-multi-acquirer"
+          data_stream_namespace => "prod"
+        }
+      }
+    fallback.conf: |
+      input { pipeline { address => "fallback" } }
+      filter {
+        drop {}
+      }
+      output { }
+metricbeat:
+  nameOverride: metricbeat
+  fullnameOverride: metricbeat
+  daemonset:
+    enabled: false
+  deployment:
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    extraVolumes:
+      - name: extra-config
+        configMap:
+          name: metricbeat-extra-config
+          items:
+            - key: ilm.json
+              path: ilm.json
+    extraVolumeMounts:
+      - name: extra-config
+        mountPath: /usr/share/metricbeat/config/extras
+        readOnly: true
+    metricbeatConfig:
+      metricbeat.yml: |
+        setup.dashboards.enabled: true
+        setup.kibana.host: "https://kibana:5601"
+        setup.kibana.ssl.certificate: "/usr/share/metricbeat/config/certs/kibana/tls.crt"
+        setup.kibana.ssl.key: "/usr/share/metricbeat/config/certs/kibana/tls.key"
+        setup.kibana.ssl.verification_mode: none
+        logging.metrics.enabled: false
+        monitoring:
+          enabled: true
+          cluster_uuid: "Zib9N5G6S9OzmkYmqA_2Kw"
+          elasticsearch:
+            hosts: ["https://nextpay-monitoring-data:9200"]
+            username: '${ELASTICSEARCH_USERNAME}'
+            password: '${ELASTICSEARCH_PASSWORD}'
+            ssl.verification_mode: none
+            ssl.certificate_authorities:
+              - /usr/share/metricbeat/config/certs/elastic-certificate.pem
+        setup:
+          template.settings:
+            overwrite: true
+            index.number_of_shards: 1
+            index.number_of_replicas: 0
+          ilm:
+            overwrite: true
+            policy_file: /usr/share/metricbeat/config/extras/ilm.json
+        metricbeat.modules:
+        - module: elasticsearch
+          xpack.enabled: true
+          metricsets: []
+          period: 10s
+          scope: cluster
+          hosts: ["https://nextpay-monitoring-master:9200", "https://nextpay-monitoring-data:9200"]
+          username: '${ELASTICSEARCH_USERNAME}'
+          password: '${ELASTICSEARCH_PASSWORD}'
+          ssl.enabled: true
+          ssl.verification_mode: none
+          ssl.certificate_authorities:
+            - /usr/share/metricbeat/config/certs/elastic-certificate.pem
+        - module: logstash
+          xpack.enabled: true
+          metricsets: ["node", "node_stats"]
+          period: 10s
+          hosts:
+            - logstash-0-http:9600
+            - logstash-1-http:9600
+        # State metrics from kube-state-metrics service:
+        - module: kibana
+          xpack.enabled: true
+          metricsets:
+            - stats
+          period: 10s
+          username: '${ELASTICSEARCH_USERNAME}'
+          password: '${ELASTICSEARCH_PASSWORD}'
+          hosts: ["https://kibana:5601"]
+          ssl.verification_mode: none
+        - module: beat
+          enabled: false
+          metricsets:
+            - stats
+            - state
+          period: 10s
+          hosts: ["http://apm-server:5067"]
+          #username: "user"
+          #password: "secret"
+          xpack.enabled: true
+        - module: kubernetes
+          enabled: false
+        - module: system
+          enabled: false
+        - module: mysql
+          metricsets: ["status", "performance"]
+          period: 10s
+          hosts:
+            - "duclm:PERE8b8wrn,jZ4pHJN9Lo@tcp(10.0.23.30:3306)/"
+            - "duclm:PERE8b8wrn,jZ4pHJN9Lo@tcp(10.0.23.32:3306)/"
+        - module: mongodb
+          metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
+          period: 10s
+          hosts:
+            - "mongodb://root:VYD6%40qa11aaaD0a@10.0.22.37:27017"
+        - module: kafka
+          metricsets:
+            - partition
+            - consumergroup
+          period: 10s
+          hosts:
+            - 10.0.22.10:9092
+        - module: redis
+          metricsets:
+            - info
+            - keyspace
+            - key
+          key.patterns:
+            - pattern: 'session:*'
+              limit: 100
+            - pattern: 'MPOSCMD_SACOMBANK*'
+              limit: 100
+            - pattern: 'MPOSCMD_VIETCOMBANK*'
+              limit: 100
+          period: 10s
+          hosts:
+            - 10.0.23.10:30004
+        output.elasticsearch:
+          username: '${ELASTICSEARCH_USERNAME}'
+          password: '${ELASTICSEARCH_PASSWORD}'
+          protocol: https
+          hosts: ["nextpay-monitoring-data:9200"]
+          ssl.enabled: true
+          ssl.verification_mode: none
+          ssl.certificate_authorities:
+            - /usr/share/metricbeat/config/certs/elastic-certificate.pem
+    extraEnvs:
+      - name: "TZ"
+        value: "Asia/Ho_Chi_Minh"
+      - name: 'ELASTICSEARCH_USERNAME'
+        valueFrom:
+          secretKeyRef:
+            name: elastic-credentials
+            key: username
+      - name: 'ELASTICSEARCH_PASSWORD'
+        valueFrom:
+          secretKeyRef:
+            name: elastic-credentials
+            key: password
+  secretMounts:
+    - name: elastic-certificates
+      secretName: elastic-certificates
+      path: /usr/share/metricbeat/config/certs
+    - name: nextpay-cert
+      secretName: nextpay-cert
+      path: /usr/share/metricbeat/config/certs/kibana
+filebeat:
+  nameOverride: filebeat
+  fullnameOverride: filebeat
+  daemonset:
+    extraEnvs:
+      - name: "TZ"
+        value: "Asia/Ho_Chi_Minh"
+    tolerations:
+      - operator: "Exists"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "100Mi"
+      limits:
+        cpu: "300m"
+        memory: "200Mi"
+    filebeatConfig:
+      filebeat.yml: |
+        monitoring.enabled: false
+        logging.metrics.enabled: false
+        # =========================== Filebeat autodiscover ============================
+        filebeat.autodiscover:
+          providers:
+            - type: kubernetes
+              templates:
+                - condition.or:
+                    - equals.kubernetes.namespace: elk
+                  config:
+                    - type: container
+                      paths:
+                        - /var/log/containers/*-${data.kubernetes.container.id}.log
+                      exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
+                      multiline.type: pattern
+                      multiline.pattern: '^{'
+                      multiline.negate: true
+                      multiline.match: after
+        # ------------------------------ Logstash Output -------------------------------
+        output.logstash:
+          enabled: true
+          hosts: ["logstash-0-beat:5044", "logstash-1-beat:5044"]
+          loadbalance: true
+          worker: 2
+          compression_level: 3
+          slow_start: true
+  deployment:
+    enabled: false
+apm-server:
+  nameOverride: apm-server
+  fullnameOverride: apm-server
+  replicas: 5
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    averageCpuUtilization: 70
+  extraEnvs:
+    - name: "TZ"
+      value: "Asia/Ho_Chi_Minh"
+    - name: 'ELASTICSEARCH_USERNAME'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: username
+    - name: 'ELASTICSEARCH_PASSWORD'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: password
+  secretMounts:
+    - name: elastic-certificates
+      secretName: elastic-certificates
+      path: /usr/share/apm-server/config/certs
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1024Mi"
+    limits:
+      cpu: "500m"
+      memory: "1024Mi"
+  service:
+    type: NodePort
+    nodePort: 30003
+  apmConfig:
+    apm-server.yml: |
+      logging.level: info
+      logging.metrics.enabled: false
+      http.enabled: false
+      http.port: 5067
+      monitoring.cluster_uuid: "Zib9N5G6S9OzmkYmqA_2Kw"
+      monitoring:
+        enabled: true
+        elasticsearch:
+          hosts: ["https://nextpay-monitoring-data:9200"]
+          username: '${ELASTICSEARCH_USERNAME}'
+          password: '${ELASTICSEARCH_PASSWORD}'
+          ssl.verification_mode: none
+          ssl.certificate_authorities:
+            - /usr/share/apm-server/config/certs/elastic-certificate.pem
+      apm-server:
+        host: "0.0.0.0:8200"
+        ilm:
+          setup:
+            overwrite: true
+            require_policy: true
+            policies:
+              - name: "apm-rollover-30-days"
+                policy:
+                  phases:
+                    hot:
+                      actions:
+                        rollover:
+                          max_size: "50gb"
+                          max_age: "30d"
+                        set_priority:
+                          priority: 100
+                    warm:
+                      actions:
+                        set_priority:
+                          priority: 50
+                        forcemerge:
+                          max_num_segments: 1
+                        readonly: {}
+                    delete:
+                      min_age: "30d"
+                      actions:
+                        delete:
+                          delete_searchable_snapshot: true
+      queue.mem.events: 40960
+      setup.template.settings:
+        index.number_of_shards: 2
+        index.number_of_replicas: 1
+      output.elasticsearch:
+        username: '${ELASTICSEARCH_USERNAME}'
+        password: '${ELASTICSEARCH_PASSWORD}'
+        protocol: https
+        hosts: ["nextpay-monitoring-data:9200"]
+        ssl.verification_mode: none
+        ssl.certificate_authorities:
+          - /usr/share/apm-server/config/certs/elastic-certificate.pem
+        worker: 5
+        bulk_max_size: 8192
+heartbeat:
+  enabled: true
+  nameOverride: heartbeat
+  fullnameOverride: heartbeat
+  extraEnvs:
+    - name: "TZ"
+      value: "Asia/Ho_Chi_Minh"
+    - name: 'ELASTICSEARCH_USERNAME'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: username
+    - name: 'ELASTICSEARCH_PASSWORD'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: password
+  extraVolumes:
+    - name: extra-config
+      configMap:
+        name: heartbeat-extra-config
+        items:
+          - key: ilm.json
+            path: ilm.json
+  extraVolumeMounts:
+    - name: extra-config
+      mountPath: /usr/share/heartbeat/config/extras
+      readOnly: true
+  secretMounts:
+    - name: elastic-certificates
+      secretName: elastic-certificates
+      path: /usr/share/heartbeat/config/certs
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+  heartbeatConfig:
+    heartbeat.yml: |
+      setup:
+        template.settings:
+          overwrite: true
+          index.number_of_shards: 1
+          index.number_of_replicas: 1
+        ilm:
+          overwrite: true
+          policy_file: /usr/share/heartbeat/config/extras/ilm.json
+      logging.metrics.enabled: false
+      heartbeat.monitors:
+        - type: http
+          id: service-status
+          name: Multi Acquirer
+          tags:
+            - multi-acquirer
+          service.name: macq-api-gateway
+          schedule: '@every 5s'
+          urls:
+            - https://ma.nextpay.vn
+          check.response:
+            status: [401]
+        - type: http
+          name: mPOS
+          tags:
+            - mpos
+          schedule: '@every 5s'
+          urls:
+            - https://mpos.vn
+            - https://api.mpos.vn/assets/bankqr.html
+            - https://atm360.mpos.vn
+            - https://fb.mpos.vn
+        - type: http
+          name: BaoViet
+          tags:
+            - mpos
+          schedule: '@every 5s'
+          urls:
+            - https://bvl.mpos.vn
+            - https://mpos.vn/bvl-api/hello
+        - type: http
+          name: PVI
+          tags:
+            - mpos
+          schedule: '@every 5s'
+          urls:
+            - https://pvi.mpos.vn
+            - https://mpos.vn/pvi-api/hello
+        - type: http
+          name: NextShop v1
+          tags:
+            - nextshop-v1
+          schedule: '@every 5s'
+          urls:
+            - https://nextshop.mobi
+            - https://pos.nextshop.mobi
+        - type: http
+          name: SSO page
+          tags:
+            - nextshop-v1
+          schedule: '@every 5s'
+          urls:
+            - https://sso.nextpos.vn
+        - type: http
+          name: NextShop v1 customer page
+          tags:
+            - nextshop-v1
+          schedule: '@every 5s'
+          urls:
+            - https://customer.nextpos.vn
+        - type: http
+          name: NextShop v1 homepage
+          tags:
+            - nextshop-v1
+          schedule: '@every 5s'
+          urls:
+            - https://home.nextpos.vn
+      processors:
+        - add_cloud_metadata: ~
+        - add_observer_metadata:
+            cache.ttl: 5m
+            geo:
+              name: vn-hn-vietteldc
+              location: 21.028511, 105.804817
+              continent_name: Asia
+              country_iso_code: VN
+              region_name: Hanoi
+              region_iso_code: VN-HN
+              city_name: Hanoi
+      output.elasticsearch:
+        username: '${ELASTICSEARCH_USERNAME}'
+        password: '${ELASTICSEARCH_PASSWORD}'
+        protocol: https
+        hosts: ["nextpay-monitoring-data:9200"]
+        ssl.verification_mode: none
+        ssl.certificate_authorities:
+          - /usr/share/heartbeat/config/certs/elastic-certificate.pem

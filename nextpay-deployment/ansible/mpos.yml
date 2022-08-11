@@ -1,0 +1,5 @@
+---
+- hosts: mpos_uat_2
+  become: true
+  roles:
+    - filebeat

@@ -1,0 +1,14 @@
+ANDROID----------24-08-2020 00:05:24-------------------
+ userId: mana name: MANA ,model: Samsung SM-N950U ,App version: 133 ,os: android 7.1.1 (25)
+
+**24/08/2020
+00:17:58 | ACT | --- ON PAUSE --
+00:17:59 | ACT | --- ON STOP --
+
+**24/08/2020
+00:17:59 | ACT | --- ON DESTROY --
+00:18:00 | ACT | onRequestQposDisconnected:2
+00:18:00 | ACT |  a=270000 udid=|6624a2ac-c4ff-4220-a622-f6aa4fee5ea6 transactionType=null
+
+ANDROID----------24-08-2020 00:05:24-------------------
+ userId: mana name: MANA ,model: Samsung SM-N950U ,App version: 133 ,os: android 7.1.1 (25)

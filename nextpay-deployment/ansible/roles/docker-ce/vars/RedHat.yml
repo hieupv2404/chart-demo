@@ -1,0 +1,12 @@
+---
+# variables associated with this role
+docker_required_packages:
+  # Required by the devicemapper storage driver
+  - device-mapper-persistent-data 
+  - lvm2
+docker_ce_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+docker_home_path: /data/docker
+docker_user: duclm

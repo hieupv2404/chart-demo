@@ -1,0 +1,28 @@
+---
+# tasks file for filebeat
+- name: Download filebeat package
+  get_url:
+    url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{ version }}-x86_64.rpm
+    dest: /tmp/filebeat.rpm
+
+- name: Install filebeat
+  yum:
+    name: /tmp/filebeat.rpm
+    state: present
+
+- name: Create per service directory layout
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items: "{{ directory_layout }}"
+
+- name: Copy filebeat config file
+  copy:
+    src: filebeat-{{ service }}.yml
+    dest: "{{ config_dir }}/filebeat.yml"
+
+- name: Copy filebeat startup script
+  copy:
+    src: "{{ service }}.sh"
+    dest: "{{ bin_dir }}/{{ service }}.sh"
+    mode: u+rwx

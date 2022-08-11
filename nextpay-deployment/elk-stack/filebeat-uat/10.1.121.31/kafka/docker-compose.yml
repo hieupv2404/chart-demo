@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  filebeat_kafka:
+    image: docker.elastic.co/beats/filebeat:7.5.0
+    container_name: filebeat-kafka
+    hostname: ${HOSTNAME:?err}
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    user: root
+    command: --strict.perms=false -e  # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./inputs.d/:/usr/share/filebeat/inputs.d/:ro
+      - vipost_log:/var/logs/vipost/core/:ro
+      - vipost_report_log:/var/logs/vipost/report/:ro
+      - vipost_payment_log:/var/logs/vipost/payment/:ro
+      - log:/var/log/filebeat
+    healthcheck:
+      test: filebeat test config
+      interval: 30s
+      timeout: 15s
+      retries: 5
+
+volumes: 
+  vipost_log:
+    external: true
+  vipost_report_log:
+    external: true
+  vipost_payment_log:
+    external: true
+  log:

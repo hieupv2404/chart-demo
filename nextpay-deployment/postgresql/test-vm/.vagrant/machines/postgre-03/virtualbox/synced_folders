@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/Users/duclm/Work/Vimo/Git/nextpay-deployment/postgresql/test-vm","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}

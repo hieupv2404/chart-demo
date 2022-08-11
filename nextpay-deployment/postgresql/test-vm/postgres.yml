@@ -1,0 +1,43 @@
+---
+- hosts: all
+  
+  become: true
+
+  tasks:
+  - name: Exclude Postgres package from base repository
+    ini_file:
+      path: /etc/yum.repos.d/CentOS-Base.repo
+      section: base
+      option: exclude
+      value: postgresql*
+
+  - name: Exclude Postgres package from updates repository
+    ini_file:
+      path: /etc/yum.repos.d/CentOS-Base.repo
+      section: updates
+      option: exclude
+      value: postgresql*
+
+  - name: Install official Posgres repository
+    yum:
+      name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+      state: present
+    
+  - name: Install PostgreSQL package
+    yum:
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+      - postgresql12
+      - postgresql12-server
+  
+  - name: Initialize database
+    command: /usr/pgsql-12/bin/postgresql-12-setup initdb
+
+  - name: Ensure PostgreSQL service is running
+    service:
+      name: postgresql-12
+      state: started
+      enabled: yes

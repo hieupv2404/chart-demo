@@ -1,0 +1,67 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "34"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"np-scheduler","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"np-scheduler-test-job","helm.sh/chart":"np-scheduler-test-job-0.1.0"},"name":"np-scheduler-test-job","namespace":"nextpay-services"},"spec":{"replicas":1,"revisionHistoryLimit":1,"selector":{"matchLabels":{"app.kubernetes.io/instance":"np-scheduler","app.kubernetes.io/name":"np-scheduler-test-job"}},"template":{"metadata":{"labels":{"app.kubernetes.io/instance":"np-scheduler","app.kubernetes.io/name":"np-scheduler-test-job"}},"spec":{"containers":[{"envFrom":[{"configMapRef":{"name":"np-scheduler-test-job"}}],"image":"hub.saobang.vn/nextpay/np-schedule/np-scheduler-test-job:dev-2bde0a75","imagePullPolicy":"IfNotPresent","name":"np-scheduler-test-job","ports":[{"containerPort":80,"name":"http","protocol":"TCP"}],"resources":{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":null}],"imagePullSecrets":[{"name":"nextpay-harbor"}],"restartPolicy":"Always","volumes":null}}}}
+  creationTimestamp: "2022-03-29T11:02:42Z"
+  generation: 34
+  labels:
+    app.kubernetes.io/instance: np-scheduler
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: np-scheduler-test-job
+    helm.sh/chart: np-scheduler-test-job-0.1.0
+  name: np-scheduler-test-job
+  namespace: vault
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: np-scheduler
+      app.kubernetes.io/name: np-scheduler-test-job
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: np-scheduler
+        app.kubernetes.io/name: np-scheduler-test-job
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: np-scheduler-test-job
+        image: hub.saobang.vn/nextpay/np-schedule/np-scheduler-test-job:dev-2bde0a75
+        imagePullPolicy: IfNotPresent
+        name: np-scheduler-test-job
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: nextpay-harbor
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

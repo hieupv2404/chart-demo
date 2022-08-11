@@ -1,0 +1,16 @@
+{{- define "common.configmap" -}}
+  {{- if or .Values.configmap .Values.global.elasticApm }}
+apiVersion: v1
+kind: ConfigMap
+  {{- include "common.metadata" . }}
+data:
+{{- range $key, $value := .Values.configmap }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  {{- if .Values.global.elasticApm }}
+  {{- range $key, $value := .Values.global.elasticApm}}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}

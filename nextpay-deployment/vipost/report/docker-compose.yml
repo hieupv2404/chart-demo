@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  vipost-report:
+    image: 10.0.36.42:5000/vn.nextpay.vipost/report:${VERSION}-${JENKINS_BUILD_NUMBER}
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_CONFIG_USERNAME=NYPigyeU
+      - SPRING_CLOUD_CONFIG_PASSWORD=SfVLiyOHFHiFNpb12X6E7WrkNKIf3Oyi
+      - JAVA_OPTS=-Xmx5g -Xms2g
+    volumes:
+      - vipost_report_log:/app/vipost-report/logs
+    ports:
+      - "8100:8080"
+      - "8111:8011"
+    logging:
+      driver: json-file
+      options:
+        max-size: "512mb"
+        max-file: "3"
+    deploy:
+      mode: global
+      restart_policy:
+        max_attempts: 3
+      update_config:
+        failure_action: pause
+        monitor: 10s
+        order: stop-first
+
+volumes:
+  vipost_report_log:

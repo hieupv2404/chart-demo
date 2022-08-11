@@ -1,0 +1,20 @@
+sudo docker run -d \
+  --name=zk-vols \
+  --net=host \
+  -e ZOOKEEPER_TICK_TIME=2000 \
+  -e ZOOKEEPER_CLIENT_PORT=32181 \
+  -e TZ=Asia/Ho_Chi_Minh \
+  -v /data/zk-data:/var/lib/zookeeper/data \
+  -v /data/zk-txn-logs:/var/lib/zookeeper/log \
+  confluentinc/cp-zookeeper:5.4.1
+
+sudo docker run -d \
+  --name=kafka-vols \
+  --net=host \
+  -e KAFKA_BROKER_ID=1 \
+  -e KAFKA_ZOOKEEPER_CONNECT=10.1.121.57:32181 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://10.1.121.56:39092 \
+  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+  -e TZ=Asia/Ho_Chi_Minh \
+  -v /data/kafka-data:/var/lib/kafka/data \
+  confluentinc/cp-kafka:5.4.1

@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: https://hub.saobang.vn/chartrepo/nextpay
+  version: 0.1.25
+digest: sha256:194b3b6c7b30470bebd9a6e84929c456183e3aa728e9ac0773041884a1bf82cc
+generated: "2021-12-31T16:47:33.357967+07:00"

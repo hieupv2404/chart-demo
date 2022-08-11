@@ -1,0 +1,9 @@
+- type: log
+  paths:
+    - /var/logs/vipost/sync-order/vipost-sync-orders.log
+  fields:
+    project:
+      name: vipost
+  scan_frequency: 1s
+  encoding: utf-8
+  json.keys_under_root: true

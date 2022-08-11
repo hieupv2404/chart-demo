@@ -1,0 +1,6 @@
+---
+- hosts: all
+  
+  roles:
+    - yum-repo-setup
+    - docker-ce

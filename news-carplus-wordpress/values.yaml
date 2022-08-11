@@ -1,0 +1,58 @@
+global:
+  storageClass: "glusterfs"
+wordpress:
+  nameOverride: "news-carplus-wordpress"
+  fullnameOverride: "news-carplus-wordpress"
+  wordpressUsername: "admin"
+  wordpressPassword: "Uu%M*Xp9ZzA6*P7M"
+  wordpressEmail: "admin@carplus.mobi"
+  wordpressFirstName: "Admin"
+  wordpressLastName: "carplus"
+  wordpressBlogName: "Carplus's Blog"
+  allowEmptyPassword: false
+  smtpHost: "smtp.gmail.com"
+  smtpPort: "465"
+  smtpUser: "admin@carplus.mobi"
+  smtpPassword: "Carplus@@123!!"
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 2048Mi
+    requests:
+      cpu: 1000m
+      memory: 1024Mi
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: true
+    hostname: "news.carplus.mobi"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+      kubernetes.io/tls-acme: "true"
+    extraTls:
+      - hosts:
+          - news.carplus.mobi
+        secretName: news-carplus-cert
+  persistence:
+    enabled: true
+    size: 5Gi
+  volumePermissions:
+    enabled: true
+  mariadb:
+    enabled: true
+    auth:
+      rootPassword: "JL8Wx9HKebTMyc7aSF6T"
+      password: "C2ksEVu5vqSzjUgxQrNv"
+    primary:
+      resources:
+        requests:
+          memory: "750Mi"
+          cpu: "200m"
+        limits:
+          memory: "1024Mi"
+          cpu: "500m"
+      persistence:
+        enabled: true
+        size: 2Gi
+  memcached:
+    enabled: true

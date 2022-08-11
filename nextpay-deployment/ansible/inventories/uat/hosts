@@ -1,0 +1,14 @@
+[uat_33]
+10.1.121.33
+
+[vimo_uat]
+10.1.121.20
+
+[mpos_uat]
+10.0.24.40
+
+[mpos_uat_2]
+10.1.121.51
+
+[webserver:children]
+uat_33

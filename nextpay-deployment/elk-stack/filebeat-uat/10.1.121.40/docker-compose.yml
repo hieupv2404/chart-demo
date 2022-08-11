@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  filebeat-vipost:
+    image: docker.elastic.co/beats/filebeat:7.7.0
+    container_name: filebeat-vipost
+    hostname: ${HOSTNAME:?err}
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    user: root
+    command: --strict.perms=false -e  # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./inputs.d/:/usr/share/filebeat/inputs.d/:ro
+      - vipost-portal-api_log:/var/logs/vipost-portal-api:ro
+      - vipostsynorders_log:/var/logs/vipost-sync-order:ro
+      - vipostpayoff_log:/var/logs/vipost-pay-off:ro
+      - vipostsynerror_log:/var/logs/vipost-sync-error:ro
+    healthcheck:
+      test: filebeat test config
+      interval: 30s
+      timeout: 15s
+      retries: 5
+
+volumes: 
+  vipost-portal-api_log:
+    external: true
+  vipostsynorders_log:
+    external: true
+  vipostpayoff_log:
+    external: true
+  vipostsynerror_log:
+    external: true

@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${TAG}
+    container_name: filebeat
+    hostname: ${HOSTNAME:?err}
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    user: root
+    command: --strict.perms=false -e # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./inputs.d/:/usr/share/filebeat/inputs.d/:ro
+      - ./config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - vimo_user_log:/var/logs/user:ro
+      - vimo_payment_log:/var/logs/payment:ro
+      - vimo_vas_log:/var/logs/vas:ro
+      - vimo_merchant_log:/var/logs/merchant:ro
+      - vimo_wallet_log:/var/logs/wallet:ro
+      - vimo_checkout_log:/var/logs/checkout:ro
+      - vimo_backend_log:/var/logs/backend:ro
+      - vimo_media_log:/var/logs/media:ro
+      - vimo_notify_log:/var/logs/notify:ro
+    healthcheck:
+      test: filebeat test config
+      interval: 30s
+      timeout: 15s
+      retries: 5
+    logging:
+      options:
+        max-size: "512m"
+        max-file: "3"
+      driver: json-file
+
+volumes:
+  vimo_user_log:
+    external: true
+  vimo_payment_log:
+    external: true
+  vimo_vas_log:
+    external: true
+  vimo_merchant_log:
+    external: true
+  vimo_wallet_log:
+    external: true
+  vimo_checkout_log:
+    external: true
+  vimo_backend_log:
+    external: true
+  vimo_media_log:
+    external: true
+  vimo_notify_log:
+    external: true

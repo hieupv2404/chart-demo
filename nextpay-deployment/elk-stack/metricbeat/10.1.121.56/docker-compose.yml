@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.6.2
+    container_name: metricbeat
+    hostname: ${HOSTNAME:?err}
+    command: --strict.perms=false -e  # -e flag to log to stderr and disable syslog/file output
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    volumes:
+      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - ./modules.d:/usr/share/metricbeat/modules.d
+    network_mode: "host"
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+    healthcheck:
+      test: metricbeat test config
+      interval: 30s
+      timeout: 15s
+      retries: 5

@@ -1,0 +1,11 @@
+- type: log
+  paths: 
+    - /var/logs/payment_gateway_test/payment_gateway_test.log
+  fields:
+    project:
+      name: payment-gateway-stg
+      log_type: test
+  fields_under_root: true
+  scan_frequency: 3s
+  encoding: utf-8
+  json.keys_under_root: true

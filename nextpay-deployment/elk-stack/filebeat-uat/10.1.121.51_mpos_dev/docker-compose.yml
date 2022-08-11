@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${TAG}
+    container_name: filebeat
+    hostname: ${HOSTNAME:?err}
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    user: root
+    command: --strict.perms=false -e # -e flag to log to stderr and disable syslog/file output
+    volumes:
+      - ./inputs.d/:/usr/share/filebeat/inputs.d/:ro
+      - ./config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /data/tomcat8/mpos-api/logs/mpos-api/:/var/logs/mpos-api/:ro
+      - /data/tomcat8/mpos-portal/logs/mpos-portal/:/var/logs/mpos-portal/:ro
+      - /data/tomcat8/mpos-portal-without-jobs/logs/mpos-portal/:/var/logs/mpos-portal-without-jobs/:ro
+    healthcheck:
+      test: filebeat test config
+      interval: 30s
+      timeout: 15s
+      retries: 5
+    logging:
+      options:
+        max-size: "512m"
+        max-file: "3"
+      driver: json-file

@@ -1,0 +1,27 @@
+dependencies:
+- name: es-master-node
+  repository: ""
+  version: 0.1.0
+- name: es-data-node
+  repository: ""
+  version: 0.1.0
+- name: kibana
+  repository: https://helm.elastic.co
+  version: 7.16.2
+- name: logstash
+  repository: https://helm.elastic.co
+  version: 7.16.2
+- name: metricbeat
+  repository: https://helm.elastic.co
+  version: 7.16.2
+- name: filebeat
+  repository: https://helm.elastic.co
+  version: 7.16.2
+- name: apm-server
+  repository: https://helm.elastic.co
+  version: 7.16.2
+- name: heartbeat
+  repository: https://hub.saobang.vn/chartrepo/nextpay
+  version: 7.16.2
+digest: sha256:f6d9168ef431f2284fc63671b9b27ad72c1a128c12d66d084f4b23585e5cf26f
+generated: "2022-03-12T11:01:56.627477+07:00"

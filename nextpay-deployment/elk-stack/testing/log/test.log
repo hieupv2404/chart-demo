@@ -1,0 +1,53 @@
+ANDROID----------24-08-2020 00:04:48-------------------
+ userId: mana name: MANA ,model: Samsung SM-N950U ,App version: 133 ,os: android 7.1.1 (25)
+
+**24/08/2020
+00:16:22 | ACT | - Auto login
+00:16:22 | REQ | GATEWAY_MERCHANT_LOGIN_SDK
+00:16:23 | REQ | GATEWAY_MERCHANT_LOGIN_SDK success
+00:16:23 | ACT | save cache:{"serial":"MPOS2003181160","bank":"SACOMBANK"}
+00:16:23 | ACT | initConfigServer:SACOMBANK
+00:16:23 | ACT | initB:2
+00:16:23 | REQ | INIT
+00:16:23 | ACT | typeServer=2 typedevice=4
+00:16:23 | REQ | LOGIN: haveForceReversal=false -- MPOS2003181160
+00:16:24 | ACT | - checkHaveForceReversal: trxType= amount=
+00:16:24 | ACT | - goto Next Screen
+
+**24/08/2020
+00:16:24 | ACT |  checkUpdateCaPulicKey
+00:16:32 | ACT |  a=270000 udid=|d2d729b8-ccff-4ddb-8909-d9406c55daef transactionType=null
+
+**24/08/2020
+00:16:32 | REQ | PREPARE_TRANSACTION
+00:16:33 | ACT | --- IN SCREEN SWIPE CARD -- manaPR-02 amount:270000
+00:16:33 | ACT | --- ON START --
+00:16:33 | ACT | --- ON RESUME --
+00:16:35 | ACT | onRequestQposConnected:2
+00:17:48 | ACT | onDoTradeResult:11-> MCR
+00:17:48 | ACT | --mp:498769XXXXXX5656
+00:17:48 | REQ | PAYMENT_MAGSTRIPE -1-
+00:17:49 | REQ | PAYMENT_MAGSTRIPE: error in server:
+00:17:49 | REQ | >>error in server: code=8103 -->Magstripe not permitted, please use card's chip data.
+00:17:49 | ACT | returnFailurePayment: typeF=2 typeVoidF=0 relogin=false msg:Magstripe not permitted, please use card's chip data.
+00:17:49 | ACT | typePostPay= pushBackError=null
+00:17:49 | ACT | showDialogReason
+
+IOS----------24-08-2020 00:05:17-------------------
+USER_MOBILE: Utateiitomo | VERSION: 5.3.9 | FW_VERSION: 1.0.20081201 | IOS_DEVICE: iPad | OS: 13.6
+00:01:23 24/08/2020 | REQUEST | SAVE_LOG_ACTION
+00:01:23 24/08/2020 | RESPONSE | SAVE_LOG_ACTION - SUCCESS
+00:01:49 24/08/2020 | ACTION | CLOSE_ERROR_VIEW - TITLE: Close
+00:01:49 24/08/2020 | ACTION | |BLUPA | - READ CARD FINISH: 0
+00:01:49 24/08/2020 | ACTION | |QPOS  | - >>> FINISH TRANSACTION
+00:01:49 24/08/2020 | ACTION | |QPOS  | - >>> RESET QPOS : MPOS9032102893
+00:01:50 24/08/2020 | ACTION | |QPOS  | - >>> STOP SCAN BLUETOOTH
+00:01:50 24/08/2020 | ACTION | |QPOS  | - Finish Process Card
+00:01:50 24/08/2020 | ACTION | |QPOS  | - >>> FINISH TRANSACTION
+00:01:50 24/08/2020 | ACTION | |QPOS  | - >>> RESET QPOS : (null)
+00:01:50 24/08/2020 | ACTION | |QPOS  | - >>> STOP SCAN BLUETOOTH
+00:01:50 24/08/2020 | ACTION | |QPOS  | - >>>>>>>>>>>>>>>>>>>>>>>>>onError:
+00:01:50 24/08/2020 | ACTION | |QPOS  | - >>>>>>>>>>>>>>>>>>>>>>>>>onError:
+00:04:25 24/08/2020 | ACTION | ++ APPLICATION WILL DIDBECOME ACTIVE: %@
+00:04:41 24/08/2020 | BUTTON_ACTION | Pay Now
+00:04:42 24/08/2020 | REQUEST | PREPARE_TRANSACTION

@@ -1,0 +1,62 @@
+apiVersion: v2
+name: services
+description: services Helm chart application
+
+# A chart can be either an 'application' or a 'library' chart.
+#
+# Application charts are a collection of templates that can be packaged into versioned archives
+# to be deployed.
+#
+# Library charts provide useful utilities or functions for the chart developer. They're included as
+# a dependency of application charts to inject those utilities and functions into the rendering
+# pipeline. Library charts do not define any templates and therefore cannot be deployed.
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application. Versions are not expected to
+# follow Semantic Versioning. They should reflect the version the application is using.
+# It is recommended to use it with quotes.
+appVersion: "1.0.0"
+
+dependencies:
+  - name: contact-list
+    version: 0.1.0
+    condition: contact-list.enabled
+  - name: npa-mamp-apmn
+    version: 0.1.0
+    condition: npa-mamp-apmn.enabled
+  - name: npa-n360-common
+    version: 0.1.0
+    condition: npa-n360-common.enabled
+  - name: npa-n360-mcmnt
+    version: 0.1.0
+    condition: npa-n360-mcmnt.enabled
+  - name: admin-next360-vn
+    version: 0.1.0
+    condition: admin-next360-vn.enabled
+  - name: marketplace-web
+    version: 0.1.0
+    condition: marketplace-web.enabled
+  - name: npa-n360-report
+    version: 0.1.0
+    condition: npa-n360-report.enabled
+  - name: npa-n360-portal
+    version: 0.1.0
+    condition: npa-n360-portal.enabled
+  - name: npa-n360-portal-web
+    version: 0.1.0
+    condition: npa-n360-portal-web.enabled
+  - name: npa-n360-pmo
+    version: 0.1.0
+    condition: npa-n360-pmo.enabled
+  - name: npa-n360-pmoweb
+    version: 0.1.0
+    condition: npa-n360-pmoweb.enabled
+  - name: npa-n360-notify
+    version: 0.1.0
+    condition: npa-n360-notify.enabled

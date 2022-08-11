@@ -1,0 +1,30 @@
+# Source: news-carplus-wordpress/charts/wordpress/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: news-carplus-wordpress-admin
+  namespace: news-carplus
+  labels:
+    app.kubernetes.io/name: news-carplus-wordpress
+    helm.sh/chart: wordpress-12.1.16
+    app.kubernetes.io/instance: abc
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/whitelist-source-range: 183.91.7.129,183.91.4.105,101.99.7.213,101.99.7.132,14.177.239.192,14.177.239.203,14.177.239.244
+spec:
+  rules:
+    - host: "news.carplus.mobi"
+      http:
+        paths:
+          - path: /wp-login.php
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: news-carplus-wordpress
+                port:
+                  name: http
+  tls:
+    - hosts:
+      - news.carplus.mobi
+      secretName: news-carplus-cert

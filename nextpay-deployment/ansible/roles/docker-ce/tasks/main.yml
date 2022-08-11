@@ -1,0 +1,22 @@
+---
+# Include variables and define needed variables.
+# - name: Confirm install/re-install Docker
+#   pause:
+#     prompt: This will remove Docker (and its data) if exists, then install new version. Are you sure (yes/no)?
+#   register: confirm
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+  # when: confirm.user_input | bool
+
+- include_tasks: "cleanup-{{ ansible_os_family }}.yml"
+  # when: confirm.user_input | bool and ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_version']|int <= 7
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_version']|int <= 7
+
+- include_tasks: "setup-{{ ansible_os_family }}.yml"
+  # when: confirm.user_input | bool and ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_version']|int <= 7
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_version']|int <= 7
+
+- name: Configure Docker engine
+  include_tasks: "config-{{ ansible_os_family }}.yml"
+  # when: confirm.user_input | bool and ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_version']|int <= 7
+  when: ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_version']|int <= 7

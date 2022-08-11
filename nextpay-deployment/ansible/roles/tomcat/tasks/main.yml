@@ -1,0 +1,29 @@
+---
+# tasks file for java8
+- name: Include Tomcat version variable
+  include_vars: "main.yml"
+
+- name: Install OpenJDK 8
+  become: yes
+  yum:
+    update_cache: yes
+    name: java-1.8.0-openjdk
+    state: latest
+
+- name: Download Tomcat 8
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+  get_url:
+    url: https://mirror.downloadvn.com/apache/tomcat/tomcat-8/v{{ tomcat8_version }}/bin/apache-tomcat-{{ tomcat8_version }}.tar.gz
+    dest: /tmp/apache-tomcat-{{ tomcat8_version }}.tar.gz
+
+- name: Unarchive Tomcat 8
+  unarchive:
+    src: /tmp/apache-tomcat-{{ tomcat8_version }}.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Move Tomcat 8 to local folder
+  copy:
+    src: /tmp/apache-tomcat-{{ tomcat8_version }}/
+    dest: /usr/local/tomcat8/

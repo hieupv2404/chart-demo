@@ -1,0 +1,6 @@
+dependencies:
+- name: elastic-apm-agent
+  repository: https://hub.saobang.vn/chartrepo/nextpay-common
+  version: 0.1.0
+digest: sha256:ec23b4c8b00a9cb1083992998cbb84fe9fc6086de109834de8a7d742947547fa
+generated: "2021-05-20T15:33:07.530564+07:00"

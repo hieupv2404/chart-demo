@@ -1,0 +1,8 @@
+- type: log
+  paths: 
+    - /var/logs/vipost-pay-off/vipost-pay-off.log
+  fields:
+    log_type: vipost-pay-off
+  scan_frequency: 5s
+  encoding: utf-8
+  json.keys_under_root: true

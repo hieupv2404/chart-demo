@@ -1,0 +1,244 @@
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-api-gateway/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: npa-api-gateway
+  labels:
+    helm.sh/chart: npa-api-gateway-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-api-gateway
+    app.kubernetes.io/instance: abc
+  
+data:
+  ELASTIC_APM_ENABLED: "false"
+  ELASTIC_APM_ENABLE_LOG_CORRELATION: "false"
+  ELASTIC_APM_ENVIRONMENT: "core-platform-front-prod"
+  ELASTIC_APM_SERVER_URL: "http://10.1.150.114:8200"
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-host-master/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: npa-host-master
+  labels:
+    helm.sh/chart: npa-host-master-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-host-master
+    app.kubernetes.io/instance: abc
+  
+data:
+  ELASTIC_APM_ENABLED: "false"
+  ELASTIC_APM_ENABLE_LOG_CORRELATION: "false"
+  ELASTIC_APM_ENVIRONMENT: "core-platform-front-prod"
+  ELASTIC_APM_SERVER_URL: "http://10.1.150.114:8200"
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-iam/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: npa-iam
+  labels:
+    helm.sh/chart: npa-iam-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-iam
+    app.kubernetes.io/instance: abc
+  
+data:
+  ELASTIC_APM_ENABLED: "false"
+  ELASTIC_APM_ENABLE_LOG_CORRELATION: "false"
+  ELASTIC_APM_ENVIRONMENT: "core-platform-front-prod"
+  ELASTIC_APM_SERVER_URL: "http://10.1.150.114:8200"
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-proxy-gateway/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: npa-proxy-gateway
+  labels:
+    helm.sh/chart: npa-proxy-gateway-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-proxy-gateway
+    app.kubernetes.io/instance: abc
+  
+data:
+  ELASTIC_APM_ENABLED: "false"
+  ELASTIC_APM_ENABLE_LOG_CORRELATION: "false"
+  ELASTIC_APM_ENVIRONMENT: "core-platform-front-prod"
+  ELASTIC_APM_SERVER_URL: "http://10.1.150.114:8200"
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-api-gateway/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: npa-api-gateway
+  labels:
+    helm.sh/chart: npa-api-gateway-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-api-gateway
+    app.kubernetes.io/instance: abc
+  
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: npa-api-gateway
+      app.kubernetes.io/instance: abc
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: npa-api-gateway
+        app.kubernetes.io/instance: abc
+    spec:
+      imagePullSecrets:
+        - name: nextpay-harbor
+      restartPolicy: Always
+      containers:
+        - name: npa-api-gateway
+          image: "hub.saobang.vn/nextpay-prod/core-platform-front/:1.16.0"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: npa-api-gateway
+          volumeMounts:
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      volumes:
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-host-master/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: npa-host-master
+  labels:
+    helm.sh/chart: npa-host-master-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-host-master
+    app.kubernetes.io/instance: abc
+  
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: npa-host-master
+      app.kubernetes.io/instance: abc
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: npa-host-master
+        app.kubernetes.io/instance: abc
+    spec:
+      imagePullSecrets:
+        - name: nextpay-harbor
+      restartPolicy: Always
+      containers:
+        - name: npa-host-master
+          image: "hub.saobang.vn/nextpay-prod/core-platform-front/:1.16.0"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: npa-host-master
+          volumeMounts:
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      volumes:
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-iam/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: npa-iam
+  labels:
+    helm.sh/chart: npa-iam-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-iam
+    app.kubernetes.io/instance: abc
+  
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: npa-iam
+      app.kubernetes.io/instance: abc
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: npa-iam
+        app.kubernetes.io/instance: abc
+    spec:
+      imagePullSecrets:
+        - name: nextpay-harbor
+      restartPolicy: Always
+      containers:
+        - name: npa-iam
+          image: "hub.saobang.vn/nextpay-prod/core-platform-front/:1.16.0"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: npa-iam
+          volumeMounts:
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      volumes:
+---
+# Source: core-platform-front-prod/charts/core-platform-front/charts/services/charts/npa-proxy-gateway/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: npa-proxy-gateway
+  labels:
+    helm.sh/chart: npa-proxy-gateway-0.1.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: npa-proxy-gateway
+    app.kubernetes.io/instance: abc
+  
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: npa-proxy-gateway
+      app.kubernetes.io/instance: abc
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: npa-proxy-gateway
+        app.kubernetes.io/instance: abc
+    spec:
+      imagePullSecrets:
+        - name: nextpay-harbor
+      restartPolicy: Always
+      containers:
+        - name: npa-proxy-gateway
+          image: "hub.saobang.vn/nextpay-prod/core-platform-front/:1.16.0"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: npa-proxy-gateway
+          volumeMounts:
+          resources:
+            limits:
+              cpu: 200m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      volumes:

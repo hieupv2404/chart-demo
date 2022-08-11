@@ -1,0 +1,13 @@
+---
+# tasks file for docker-move
+- name: Install rsync
+  yum:
+    name: rsync
+    state: present
+
+- name: Checking if Docker data directory exists
+  stat:
+    path: /var/lib/docker
+  register: docker_data
+
+- name: Backup docker data to new directory

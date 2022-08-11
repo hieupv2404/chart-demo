@@ -1,0 +1,74 @@
+version: "3"
+
+services:
+  postgres-master:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: postgres-master
+    env_file: .env_pg
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_master:/var/lib/postgresql/data
+      - ./config/master/postgresql.conf:/etc/postgresql/conf.d/postgresql.conf
+    command: -c 'config_file=/etc/postgresql/conf.d/postgresql.conf'
+    networks:
+      cluster:
+        aliases:
+          - pg-master
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+
+  postgres-slave:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: postgres-slave
+    user: postgres
+    env_file: .env_pg
+    ports:
+      - 6432:5432
+    volumes:
+      - pg_slave:/var/lib/postgresql/data
+      - ./config/slave:/etc/postgresql/conf.d
+    command: -c 'config_file=/etc/postgresql/conf.d/postgresql.conf'
+    networks:
+      cluster:
+        aliases: 
+          - pg-slave
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: pgadmin
+    env_file: .env_pgadmin
+    ports:
+      - 6789:80
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    networks:
+      - cluster
+    logging:
+      options:
+        max-size: '512m'
+        max-file: '3'
+      driver: json-file
+
+networks:
+  cluster:
+
+volumes:
+  pg_master:
+  pg_slave:
+  pgadmin:
